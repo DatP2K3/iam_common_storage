@@ -1,0 +1,132 @@
+14:27:44.179 INFO  o.h.v.i.u.Version - HV000001: Hibernate Validator 8.0.2.Final
+14:27:44.204 INFO  c.e.i.IamApplication - Starting IamApplication using Java 21.0.5 with PID 2948 (/Users/macbookairm3/Documents/Java Intern/iamService2/target/classes started by macbookairm3 in /Users/macbookairm3/Documents/Java Intern)
+14:27:44.204 INFO  c.e.i.IamApplication - No active profile set, falling back to 1 default profile: "default"
+14:27:45.133 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+14:27:45.134 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+14:27:45.265 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 117 ms. Found 6 JPA repository interfaces.
+14:27:45.277 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+14:27:45.278 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+14:27:45.289 INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.evotek.iam.repository.OauthClientRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+14:27:45.290 INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.evotek.iam.repository.PermissionsRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+14:27:45.290 INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.evotek.iam.repository.RolePermissionRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+14:27:45.290 INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.evotek.iam.repository.RoleRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+14:27:45.290 INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.evotek.iam.repository.UserRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+14:27:45.290 INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.evotek.iam.repository.UserRoleRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+14:27:45.290 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 5 ms. Found 0 Redis repository interfaces.
+14:27:45.522 INFO  o.s.c.c.s.GenericScope - BeanFactory id=0471cbfe-32d9-3ea6-819e-8be034577b57
+14:27:45.833 INFO  o.s.b.w.e.t.TomcatWebServer - Tomcat initialized with port 8888 (http)
+14:27:45.840 INFO  o.a.c.h.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8888"]
+14:27:45.840 INFO  o.a.c.c.StandardService - Starting service [Tomcat]
+14:27:45.840 INFO  o.a.c.c.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.34]
+14:27:45.874 INFO  o.a.c.c.C.[.[.[/] - Initializing Spring embedded WebApplicationContext
+14:27:45.875 INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1649 ms
+14:27:46.419 INFO  o.h.Version - HHH000412: Hibernate ORM core version 6.5.3.Final
+14:27:46.435 INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+14:27:46.587 INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+14:27:46.605 INFO  c.z.h.HikariDataSource - HikariPool-1 - Starting...
+14:27:46.703 INFO  c.z.h.p.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@3a89226e
+14:27:46.703 INFO  c.z.h.HikariDataSource - HikariPool-1 - Start completed.
+14:27:47.297 INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+14:27:47.329 INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+14:27:47.530 INFO  o.s.d.j.r.q.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+14:27:48.105 INFO  c.e.i.c.InitConfig - Initializing application.....
+14:27:48.784 INFO  o.a.c.h.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8888"]
+14:27:48.791 INFO  o.s.b.w.e.t.TomcatWebServer - Tomcat started on port 8888 (http) with context path '/'
+14:27:48.805 INFO  c.e.i.IamApplication - Started IamApplication in 4.922 seconds (process running for 5.553)
+14:27:48.880 INFO  c.e.i.c.InitConfig - Application initialization completed .....
+14:28:04.573 INFO  o.a.c.c.C.[.[.[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+14:28:04.574 INFO  o.s.w.s.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+14:28:04.576 INFO  o.s.w.s.DispatcherServlet - Completed initialization in 2 ms
+14:28:04.751 INFO  c.e.c.w.c.ActionLogFilter - ActionLogFilter response: Response: {"data":"eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJldm90ZWsuaWFtLmNvbSIsInN1YiI6ImlhbSIsImlhdCI6MTczODc0MDQ4NCwidXNlcklkIjoiY29tbW9uIiwianRpIjoiNTNjN2Q4ZjctMjk3NS00N2MzLWFiZTMtM2U1NWQ4ZDM0ZTQ3In0.ZmG20eSsPufzLO-9MEp2nRJda4mz4g3dDuraf-3wrqO4NFE3KTboHCicbpAfZLWtxNAw2YCoCR27wuHomeY6CMrejEnEkUWtjQPrVpvRhLSMGPSzIGrW38zrpS8WyG2aa9IG0agFx4OR6R-KLkA2X54SseX8-oqbMEAv2vQ25jD6guMiz15NmFOsOB_zBun1RbnsF4Tx2yeCV9RkF5IbiU6sBYUJFkOVtDBzDumuz0TR4T9ZSEBtF8gxga-0djS51gHH2ZTQdpvY82NOG4938d3aFeTpIm4URN5CR3nafVfPtOOvwTYW4tE3qQ3766NU8DFtA869_bWSlyoyGgXXjA","success":true,"code":200,"message":"Get client authority successfully","timestamp":1738740484729,"status":"OK"}
+14:28:04.860 INFO  c.e.c.w.c.ActionLogFilter - ActionLogFilter response: Response: {"keys":[{"kty":"RSA","e":"AQAB","use":"sig","kid":"d87211cf-d3f4-402d-acc1-3ff6b3adab91","alg":"RS256","n":"05Nmlr8EdJPdkAfiGcSNgHverMLmycBdpzPTGPG7QpnbIUHnMj_JBmr2opbiLT0JR9PZUNtNwITCeKV1jA-2g_Hhgw18XNwiD2ztllOUkei6E5Z4B8fOqqr7oD1K9gZSpbp70QuMF73Si3qIO1JVhObFFsJMXq_dXyVD5VS7C5TJB0feiO40oHfc3l0bBy64Ps6pUZB8JTcPPJPpru_YhSL1AYpbC3VNMIcBaK_ygusl5MiAcBAt4luol_m9CxdNbK3ySKn3vPFIDEXBp7s9U84yo6Vns_rPUV1JLIVB95rOjckYFm8Zm3H9VeMHXfwylkP6kMAKAgw9XSCDmPhBZw"}]}
+14:28:04.867 INFO  c.e.c.w.s.ForbiddenTokenFilter - ForbiddenTokenFilter
+14:28:05.102 INFO  c.e.c.w.s.CustomAuthenticationFilter - CustomAuthenticationFilter
+14:28:05.112 INFO  c.e.c.w.c.ActionLogFilter - ActionLogFilter response: Response: {"data":{"userId":1,"isRoot":false,"isClient":true,"grantedPermissions":null},"success":true,"code":200,"message":"Get client authority successfully","timestamp":1738740485109,"status":"OK"}
+14:28:05.165 INFO  c.e.c.w.c.ActionLogFilter - ActionLogFilter response: Response: {"data":{"userId":1,"isRoot":true,"isClient":false,"grantedPermissions":["permission.create","permission.read","permission.update","permission.delete","role.create","role.read","role.update","role.delete","user.read","user.update","user.create","user.delete","file.read","file.create","file.update","file.delete"]},"success":true,"code":200,"message":"Get client authority successfully","timestamp":1738740485163,"status":"OK"}
+14:30:37.688 INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+14:30:37.691 INFO  c.z.h.HikariDataSource - HikariPool-1 - Shutdown initiated...
+14:30:37.693 INFO  c.z.h.HikariDataSource - HikariPool-1 - Shutdown completed.
+14:30:39.854 INFO  o.h.v.i.u.Version - HV000001: Hibernate Validator 8.0.2.Final
+14:30:39.878 INFO  c.e.i.IamApplication - Starting IamApplication using Java 21.0.5 with PID 3089 (/Users/macbookairm3/Documents/Java Intern/iamService2/target/classes started by macbookairm3 in /Users/macbookairm3/Documents/Java Intern)
+14:30:39.878 INFO  c.e.i.IamApplication - No active profile set, falling back to 1 default profile: "default"
+14:30:40.494 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+14:30:40.495 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+14:30:40.601 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 96 ms. Found 6 JPA repository interfaces.
+14:30:40.611 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+14:30:40.612 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+14:30:40.622 INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.evotek.iam.repository.OauthClientRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+14:30:40.622 INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.evotek.iam.repository.PermissionsRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+14:30:40.622 INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.evotek.iam.repository.RolePermissionRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+14:30:40.622 INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.evotek.iam.repository.RoleRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+14:30:40.622 INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.evotek.iam.repository.UserRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+14:30:40.622 INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.evotek.iam.repository.UserRoleRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+14:30:40.622 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 5 ms. Found 0 Redis repository interfaces.
+14:30:40.788 INFO  o.s.c.c.s.GenericScope - BeanFactory id=0471cbfe-32d9-3ea6-819e-8be034577b57
+14:30:41.081 INFO  o.s.b.w.e.t.TomcatWebServer - Tomcat initialized with port 8888 (http)
+14:30:41.087 INFO  o.a.c.h.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8888"]
+14:30:41.088 INFO  o.a.c.c.StandardService - Starting service [Tomcat]
+14:30:41.088 INFO  o.a.c.c.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.34]
+14:30:41.122 INFO  o.a.c.c.C.[.[.[/] - Initializing Spring embedded WebApplicationContext
+14:30:41.123 INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1222 ms
+14:30:41.678 INFO  o.h.Version - HHH000412: Hibernate ORM core version 6.5.3.Final
+14:30:41.696 INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+14:30:41.846 INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+14:30:41.864 INFO  c.z.h.HikariDataSource - HikariPool-1 - Starting...
+14:30:41.956 INFO  c.z.h.p.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@15ea0ca3
+14:30:41.956 INFO  c.z.h.HikariDataSource - HikariPool-1 - Start completed.
+14:30:42.557 INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+14:30:42.588 INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+14:30:42.802 INFO  o.s.d.j.r.q.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+14:30:43.381 INFO  c.e.i.c.InitConfig - Initializing application.....
+14:30:44.069 INFO  o.a.c.h.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8888"]
+14:30:44.075 INFO  o.s.b.w.e.t.TomcatWebServer - Tomcat started on port 8888 (http) with context path '/'
+14:30:44.088 INFO  c.e.i.IamApplication - Started IamApplication in 4.544 seconds (process running for 4.922)
+14:30:44.162 INFO  c.e.i.c.InitConfig - Application initialization completed .....
+14:30:50.712 INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+14:30:50.713 INFO  c.z.h.HikariDataSource - HikariPool-1 - Shutdown initiated...
+14:30:50.715 INFO  c.z.h.HikariDataSource - HikariPool-1 - Shutdown completed.
+14:30:56.223 INFO  o.h.v.i.u.Version - HV000001: Hibernate Validator 8.0.2.Final
+14:30:56.254 INFO  c.e.i.IamApplication - Starting IamApplication using Java 21.0.5 with PID 3113 (/Users/macbookairm3/Documents/Java Intern/iamService2/target/classes started by macbookairm3 in /Users/macbookairm3/Documents/Java Intern)
+14:30:56.255 INFO  c.e.i.IamApplication - No active profile set, falling back to 1 default profile: "default"
+14:30:56.797 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+14:30:56.798 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+14:30:56.895 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 89 ms. Found 6 JPA repository interfaces.
+14:30:56.904 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+14:30:56.904 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+14:30:56.913 INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.evotek.iam.repository.OauthClientRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+14:30:56.913 INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.evotek.iam.repository.PermissionsRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+14:30:56.913 INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.evotek.iam.repository.RolePermissionRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+14:30:56.913 INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.evotek.iam.repository.RoleRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+14:30:56.913 INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.evotek.iam.repository.UserRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+14:30:56.913 INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.evotek.iam.repository.UserRoleRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+14:30:56.913 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 4 ms. Found 0 Redis repository interfaces.
+14:30:57.079 INFO  o.s.c.c.s.GenericScope - BeanFactory id=0471cbfe-32d9-3ea6-819e-8be034577b57
+14:30:57.388 INFO  o.s.b.w.e.t.TomcatWebServer - Tomcat initialized with port 8888 (http)
+14:30:57.395 INFO  o.a.c.h.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8888"]
+14:30:57.396 INFO  o.a.c.c.StandardService - Starting service [Tomcat]
+14:30:57.396 INFO  o.a.c.c.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.34]
+14:30:57.429 INFO  o.a.c.c.C.[.[.[/] - Initializing Spring embedded WebApplicationContext
+14:30:57.429 INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1150 ms
+14:30:58.187 INFO  o.h.Version - HHH000412: Hibernate ORM core version 6.5.3.Final
+14:30:58.203 INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+14:30:58.352 INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+14:30:58.373 INFO  c.z.h.HikariDataSource - HikariPool-1 - Starting...
+14:30:58.456 INFO  c.z.h.p.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@4e212f46
+14:30:58.457 INFO  c.z.h.HikariDataSource - HikariPool-1 - Start completed.
+14:30:59.064 INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+14:30:59.095 INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+14:30:59.304 INFO  o.s.d.j.r.q.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+14:30:59.876 INFO  c.e.i.c.InitConfig - Initializing application.....
+14:31:00.572 INFO  o.a.c.h.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8888"]
+14:31:00.578 INFO  o.s.b.w.e.t.TomcatWebServer - Tomcat started on port 8888 (http) with context path '/'
+14:31:00.592 INFO  c.e.i.IamApplication - Started IamApplication in 4.727 seconds (process running for 5.145)
+14:31:00.665 INFO  c.e.i.c.InitConfig - Application initialization completed .....
+14:33:14.658 INFO  o.a.c.c.C.[.[.[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+14:33:14.659 INFO  o.s.w.s.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+14:33:14.664 INFO  o.s.w.s.DispatcherServlet - Completed initialization in 5 ms
+14:33:14.889 INFO  c.e.c.w.c.ActionLogFilter - ActionLogFilter response: Response: {"data":"eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJldm90ZWsuaWFtLmNvbSIsInN1YiI6ImlhbSIsImlhdCI6MTczODc0MDc5NCwidXNlcklkIjoiY29tbW9uIiwianRpIjoiZTVjYjM2NDMtZDNhYy00OGZjLWJjYzQtNjQ3MzZhZmY5MDZkIn0.oNES2HRLRu6Y0DulJT4mUQqIy1abTSdyYvtj0-UHg6iJL5WRWpQyfTH7KeCqoPrZKSNEqdSOij9poba-aa5PCmv-_abfxQ32gRSBfxtrrW7qe95FhQFLr8_PWcx1YyW3yVXyUHMwME57ymXcawovjF1mTFMQBBz3OdsvFO-9CgclhM1CSgm44Mb6hu1B9Vcjd24EPQzfp-8EJXZVSdQ1UwvWI3MbfqnPyPItqYz5acHEAGa0_t634BpHNu3w4Ok3TxecH5B6XxG3XJcPyWUIdDXFzJWTgAFt_87lfBrwsyXC1Vd-rtpt5GBJl0OTOmZN9cVcWlEUwnOevnNiRZquiw","success":true,"code":200,"message":"Get client authority successfully","timestamp":1738740794867,"status":"OK"}
+14:33:15.011 INFO  c.e.c.w.c.ActionLogFilter - ActionLogFilter response: Response: {"keys":[{"kty":"RSA","e":"AQAB","use":"sig","kid":"c8b3ab1b-19b5-4d44-a769-eb4bc2490eee","alg":"RS256","n":"05Nmlr8EdJPdkAfiGcSNgHverMLmycBdpzPTGPG7QpnbIUHnMj_JBmr2opbiLT0JR9PZUNtNwITCeKV1jA-2g_Hhgw18XNwiD2ztllOUkei6E5Z4B8fOqqr7oD1K9gZSpbp70QuMF73Si3qIO1JVhObFFsJMXq_dXyVD5VS7C5TJB0feiO40oHfc3l0bBy64Ps6pUZB8JTcPPJPpru_YhSL1AYpbC3VNMIcBaK_ygusl5MiAcBAt4luol_m9CxdNbK3ySKn3vPFIDEXBp7s9U84yo6Vns_rPUV1JLIVB95rOjckYFm8Zm3H9VeMHXfwylkP6kMAKAgw9XSCDmPhBZw"}]}
+14:33:15.021 INFO  c.e.c.w.s.ForbiddenTokenFilter - ForbiddenTokenFilter
+14:33:15.255 INFO  c.e.c.w.s.CustomAuthenticationFilter - CustomAuthenticationFilter
+14:33:15.266 INFO  c.e.c.w.c.ActionLogFilter - ActionLogFilter response: Response: {"data":{"userId":1,"isRoot":false,"isClient":true,"grantedPermissions":null},"success":true,"code":200,"message":"Get client authority successfully","timestamp":1738740795263,"status":"OK"}
+14:33:15.325 INFO  c.e.c.w.c.ActionLogFilter - ActionLogFilter response: Response: {"data":{"userId":1,"isRoot":true,"isClient":false,"grantedPermissions":["permission.create","permission.read","permission.update","permission.delete","role.create","role.read","role.update","role.delete","user.read","user.update","user.create","user.delete","file.read","file.create","file.update","file.delete"]},"success":true,"code":200,"message":"Get client authority successfully","timestamp":1738740795323,"status":"OK"}
