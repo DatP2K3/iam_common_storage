@@ -3,6 +3,7 @@ package com.evotek.iam.service.common;
 import com.evo.common.dto.response.ApiResponses;
 import com.evo.common.dto.response.FileResponse;
 import com.evo.common.dto.response.PageApiResponse;
+import com.evotek.iam.configuration.FeignClientConfiguration;
 import com.evotek.iam.dto.request.FileSearchRequest;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
@@ -11,7 +12,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-@FeignClient(name = "storage-service", url = "${storage-service.url}")
+@FeignClient(name = "storage-service",
+        url = "${storage-service.url}",
+        contextId = "common-iam-with-token",
+        configuration = FeignClientConfiguration.class
+    )
 public interface StorageServiceClient {
     @PostMapping(value = "/api/file/upload",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

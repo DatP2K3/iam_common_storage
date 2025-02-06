@@ -7,8 +7,9 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="gateway" />
       </profile>
-      <profile name="Annotation profile for storage" enabled="true">
+      <profile name="Annotation profile for iam" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -27,6 +28,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="gateway" options="-parameters" />
       <module name="iam" options="-parameters" />
       <module name="storage" options="-parameters" />
     </option>

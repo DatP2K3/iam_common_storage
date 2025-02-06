@@ -12,10 +12,10 @@ import com.evotek.iam.service.common.UserExportService;
 import com.evotek.iam.service.common.UserServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +30,7 @@ public class UserController {
     private final UserServiceImpl userService;
     private final UserExportService userExportService;
 
+    @PreAuthorize("hasPermission(null, 'user.admin')")
     @GetMapping("/users/authorities/{userId}")
     public UserAuthority getUserAuthority(@PathVariable int userId) {
         return null;
@@ -242,9 +243,26 @@ public class UserController {
                 .build();
     }
 
+
+    @Operation(
+            summary = "Đổi avatar",
+            description = "API này giành cho người dùng đổi avatar.",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Tệp hình ảnh để đổi avatar.",
+                    required = true,
+                    content = @Content(
+                            mediaType = "multipart/form-data",
+                            schema = @Schema(type = "string", format = "binary", name = "files")
+                    )
+            ),
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Avatar đã được đổi thành công")
+            })
     @PutMapping("/users/avatar")
-    public ApiResponses<Integer> changeAvatar(@RequestParam String username,
-                                           @RequestPart List<MultipartFile> files) {
+    public ApiResponses<Integer> changeAvatar(@Parameter(description = "Tên tài khoaản", required = true)
+                                                  @RequestParam String username,
+                                              @Parameter(description = "Tệp hình ảnh", required = true)
+                                                  @RequestPart List<MultipartFile> files) {
         int avatar = userService.changeAvatar(username, files);
         return ApiResponses.<Integer>builder()
                 .data(avatar)

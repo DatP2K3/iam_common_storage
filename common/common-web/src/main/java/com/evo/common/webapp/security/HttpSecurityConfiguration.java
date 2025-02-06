@@ -50,6 +50,14 @@ public class HttpSecurityConfiguration {
             "/api/client/authorities/**",
             "/api/client/token/**",
             "/api/uploads/**",
+            "/actuator/health",
+            "/swagger-ui/**",
+            "/v3/api-docs/**",
+            "/swagger-config",
+            "/swagger-ui.html",
+            "favicon.ico",
+            "/swagger-resources/**",
+            "/webjars/**"
     };
 
     public HttpSecurityConfiguration(ActionLogFilter actionLogFilter,
