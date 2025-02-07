@@ -8,6 +8,7 @@ import com.evotek.iam.dto.request.UpdateUserRequest;
 import com.evotek.iam.dto.request.UserRequest;
 import com.evotek.iam.dto.request.UserSearchRequest;
 import com.evotek.iam.dto.response.UserResponse;
+import com.evotek.iam.service.common.FileService;
 import com.evotek.iam.service.common.UserExportService;
 import com.evotek.iam.service.common.UserServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,6 +30,7 @@ import java.util.List;
 public class UserController {
     private final UserServiceImpl userService;
     private final UserExportService userExportService;
+    private final FileService fileService;
 
     @PreAuthorize("hasPermission(null, 'user.admin')")
     @GetMapping("/users/authorities/{userId}")
@@ -297,5 +299,10 @@ public class UserController {
                 .timestamp(System.currentTimeMillis())
                 .status("OK")
                 .build();
+    }
+
+    @GetMapping("/test-retry")
+    public ApiResponses<Void> testRetry() {
+        return fileService.testRetry();
     }
 }

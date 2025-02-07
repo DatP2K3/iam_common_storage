@@ -26,6 +26,9 @@ import org.springframework.security.oauth2.server.resource.web.authentication.Be
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.io.IOException;
 
@@ -57,7 +60,10 @@ public class HttpSecurityConfiguration {
             "/swagger-ui.html",
             "favicon.ico",
             "/swagger-resources/**",
-            "/webjars/**"
+            "/webjars/**",
+            "/swagger-resources/**",
+            "/swagger-doc/**",
+            "/api/test-retry"
     };
 
     public HttpSecurityConfiguration(ActionLogFilter actionLogFilter,
@@ -70,7 +76,8 @@ public class HttpSecurityConfiguration {
     }
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf(AbstractHttpConfigurer::disable)
+        http.cors(Customizer.withDefaults())
+            .csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authorizeHttpRequests ->
                 authorizeHttpRequests
@@ -81,8 +88,7 @@ public class HttpSecurityConfiguration {
                 .authenticationManagerResolver(this.jwkResolver(this.jwtProperties)))
             .addFilterAfter(this.forbiddenTokenFilter, BearerTokenAuthenticationFilter.class)
             .addFilterAfter(this.customAuthenticationFilter, BearerTokenAuthenticationFilter.class)
-            .addFilterAfter(this.actionLogFilter, BearerTokenAuthenticationFilter.class)
-            .csrf(AbstractHttpConfigurer::disable);
+            .addFilterAfter(this.actionLogFilter, BearerTokenAuthenticationFilter.class);
         return http.build();
     }
 
@@ -100,6 +106,19 @@ public class HttpSecurityConfiguration {
         DefaultMethodSecurityExpressionHandler expressionHandler = new DefaultMethodSecurityExpressionHandler();
         expressionHandler.setPermissionEvaluator(new RegexPermissionEvaluator());
         return expressionHandler;
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.addAllowedOrigin("*");
+        configuration.addAllowedMethod("*");
+        configuration.addAllowedHeader("*");
+        configuration.setAllowCredentials(false);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 
 }

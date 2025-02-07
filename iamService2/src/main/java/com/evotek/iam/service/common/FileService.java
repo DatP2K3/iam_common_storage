@@ -1,5 +1,6 @@
 package com.evotek.iam.service.common;
 
+import com.evo.common.dto.response.ApiResponses;
 import com.evo.common.dto.response.FileResponse;
 import com.evotek.iam.dto.request.FileSearchRequest;
 import org.springframework.web.multipart.MultipartFile;
@@ -12,4 +13,5 @@ public interface FileService {
     FileResponse updateFile(int fieldId, MultipartFile file);
     void deleteFile(int fileId);
     List<FileResponse> search(FileSearchRequest fileSearchRequest);
+    ApiResponses<Void> testRetry();
 }

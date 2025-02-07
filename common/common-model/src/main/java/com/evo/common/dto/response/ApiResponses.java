@@ -27,8 +27,11 @@ public class ApiResponses<T> implements Serializable {
 
     public static <T> ApiResponses<T> fail(RuntimeException exception) {
         ApiResponses<T> response = new ApiResponses<>();
+        response.setMessage(exception.getMessage());
         response.setSuccess(false);
+        response.setCode(500);
         response.setException(exception);
+        response.setTimestamp(System.currentTimeMillis());
         return response;
     }
 }

@@ -1,7 +1,9 @@
 package com.evotek.iam.service.common;
 
+import com.evo.common.dto.response.ApiResponses;
 import com.evo.common.dto.response.FileResponse;
 import com.evotek.iam.dto.request.FileSearchRequest;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,7 +36,12 @@ public class FileServiceImpl implements FileService{
     }
 
     @Override
-    public List<FileResponse> search(FileSearchRequest fileSearchRequest) {
+    public List<FileResponse> search(FileSearchRequest fileSearchRequest){
         return storageServiceClient.searchFiles(fileSearchRequest).getData();
+    }
+
+    @Override
+    public ApiResponses<Void> testRetry() {
+        return storageServiceClient.testRetry();
     }
 }

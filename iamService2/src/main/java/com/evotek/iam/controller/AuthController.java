@@ -31,7 +31,7 @@ public class AuthController {
     private boolean keycloakEnabled;
     private final ServiceStrategy serviceStrategy;
     private AuthService authService;
-    private final TokenPgitrovider tokenProvider;
+    private final TokenProvider tokenProvider;
 
     @PostConstruct
     public void init() {

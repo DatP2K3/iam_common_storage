@@ -14,6 +14,16 @@ import lombok.experimental.SuperBuilder;
 public class PageApiResponse<T> extends ApiResponses<T> {
     private PageableResponse pageable;
 
+    public static <T> PageApiResponse<T> fail(RuntimeException exception) {
+        return PageApiResponse.<T>builder()
+                .message(exception.getMessage())
+                .success(false)
+                .code(500)
+                .exception(exception)
+                .timestamp(System.currentTimeMillis())
+                .build();
+    }
+
     @Data
     @Builder
     public static class PageableResponse {
