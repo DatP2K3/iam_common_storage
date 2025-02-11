@@ -8,6 +8,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="common-client" />
+        <module name="config" />
         <module name="gateway" />
       </profile>
       <profile name="Annotation profile for common" enabled="true">
@@ -20,20 +21,6 @@
         <module name="common-model" />
         <module name="common-web" />
       </profile>
-      <profile name="Annotation profile for storage" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct-processor/1.6.3/mapstruct-processor-1.6.3.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct/1.6.3/mapstruct-1.6.3.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct-processor/1.6.3/mapstruct-processor-1.6.3.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct/1.6.3/mapstruct-1.6.3.jar" />
-        </processorPath>
-        <module name="storage" />
-      </profile>
       <profile name="Annotation profile for iam" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
@@ -44,6 +31,7 @@
           <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct/1.6.3/mapstruct-1.6.3.jar" />
         </processorPath>
         <module name="iam" />
+        <module name="storage" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -55,6 +43,7 @@
       <module name="common-client" options="-parameters" />
       <module name="common-model" options="-parameters" />
       <module name="common-web" options="-parameters" />
+      <module name="config" options="-parameters" />
       <module name="gateway" options="-parameters" />
       <module name="iam" options="-parameters" />
       <module name="storage" options="-parameters" />

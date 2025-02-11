@@ -3,8 +3,8 @@ package com.evotek.iam.service.common;
 import com.evo.common.dto.response.ApiResponses;
 import com.evo.common.dto.response.FileResponse;
 import com.evo.common.dto.response.PageApiResponse;
-import com.evotek.iam.configuration.FeignClientConfiguration;
 import com.evotek.iam.dto.request.FileSearchRequest;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
@@ -16,7 +16,6 @@ import java.util.List;
 @FeignClient(name = "storage-service",
         url = "${storage-service.url}",
         contextId = "common-iam-with-token",
-        configuration = FeignClientConfiguration.class,
         fallbackFactory = StorageServiceClientFallback.class
     )
 public interface StorageServiceClient {
@@ -36,8 +35,11 @@ public interface StorageServiceClient {
 
     @PostMapping(value = "/api/file",
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    PageApiResponse<List<FileResponse>> searchFiles(@RequestBody FileSearchRequest fileSearchRequest);
-
+    PageApiResponse<List<FileResponse>> searchFiles(@RequestBody FileSearchRequest fileSearchRequest);git remote add origin git@github.com:DatP2K3/iam_common_storage.git
+    git branch -M main
+    git push -u origin main
+    @CircuitBreaker(name = "default")
+    @Retry(name = "default")
     @GetMapping("/api/file/test-retry")
     ApiResponses<Void> testRetry();
 }

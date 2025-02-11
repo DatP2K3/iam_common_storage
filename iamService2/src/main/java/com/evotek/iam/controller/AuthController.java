@@ -1,6 +1,7 @@
 package com.evotek.iam.controller;
 
 import com.evo.common.dto.response.ApiResponses;
+import com.evotek.iam.configuration.AuthProperties;
 import com.evotek.iam.configuration.TokenProvider;
 import com.evotek.iam.dto.request.ClientTokenRequest;
 import com.evotek.iam.dto.request.LoginRequest;
@@ -18,27 +19,35 @@ import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
 @RestController
+//@RefreshScope
 @RequestMapping("/api")
 @RequiredArgsConstructor
 public class AuthController {
     private String typeAuthService ="keycloak_auth_service";
-    @Value("${auth.keycloak-enabled}")
-    private boolean keycloakEnabled;
+//    @Value("${auth.keycloak-enabled}")
+//    private boolean keycloakEnabled;
     private final ServiceStrategy serviceStrategy;
     private AuthService authService;
     private final TokenProvider tokenProvider;
+    private final AuthProperties authProperties;
 
     @PostConstruct
     public void init() {
-        if (!keycloakEnabled) {
+        if (!authProperties.isKeycloakEnabled()) {
             this.typeAuthService = "self_idp_auth_service";
         }
         this.authService = serviceStrategy.getAuthService(typeAuthService);
+    }
+
+    @GetMapping("/test/refresh")
+    public boolean testRefresh() {
+        return authProperties.isKeycloakEnabled();
     }
 
     @GetMapping("/certificate/.well-known/jwks.json")
@@ -65,7 +74,7 @@ public class AuthController {
                 .data(tokenResponse)
                 .success(true)
                 .code(201)
-                .message(keycloakEnabled?"Login successfully":"OTP sent to your Email")
+                .message(authProperties.isKeycloakEnabled()?"Login successfully":"OTP sent to your Email")
                 .timestamp(System.currentTimeMillis())
                 .status("OK")
                 .build();
@@ -103,8 +112,8 @@ public class AuthController {
             })
     @PostMapping("/auth/logout-user")
     ApiResponses<String> logoutIam(@Parameter(description = "request", hidden = true) HttpServletRequest request,
-                                    @Parameter(description = "Refresh token từ client", required = true) @RequestParam String refreshToken
-                                   ) {
+                                   @Parameter(description = "Refresh token từ client", required = true) @RequestParam String refreshToken
+    ) {
         authService.logoutIam(request, refreshToken);
         return ApiResponses.<String>builder()
                 .data("Logout successful")
@@ -123,7 +132,7 @@ public class AuthController {
             })
     @PostMapping("/auth/refresh")
     ApiResponses<TokenResponse> refresh(@Parameter(description = "Refresh token từ client", required = true)
-                                            @RequestParam("refreshToken") String refreshToken) {
+                                        @RequestParam("refreshToken") String refreshToken) {
         TokenResponse tokenResponse = authService.refresh(refreshToken);
         return ApiResponses.<TokenResponse>builder()
                 .data(tokenResponse)
@@ -149,13 +158,13 @@ public class AuthController {
             })
     @PostMapping("/auth/forgot-password")
     public ApiResponses<Void> requestPasswordReset(@Parameter(description = "Tên tài khoản của nguười dùng", required = true)
-                                                       @RequestParam String username,
-                                                       @RequestBody(required = false) ResetPasswordRequest resetPasswordRequest) {
+                                                   @RequestParam String username,
+                                                   @RequestBody(required = false) ResetPasswordRequest resetPasswordRequest) {
         authService.requestPasswordReset(username, resetPasswordRequest);
         return ApiResponses.<Void>builder()
                 .success(true)
                 .code(200)
-                .message(keycloakEnabled?"Password successfully reset":"Reset password link sent to email")
+                .message(authProperties.isKeycloakEnabled()?"Password successfully reset":"Reset password link sent to email")
                 .timestamp(System.currentTimeMillis())
                 .status("OK")
                 .build();

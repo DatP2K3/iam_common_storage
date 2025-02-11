@@ -35,55 +35,49 @@ public class StorageServiceClientFallback implements FallbackFactory<StorageServ
         @Override
         public ApiResponses<List<FileResponse>> uploadFiles(List<MultipartFile> files, boolean isPublic, String description) {
             if (cause instanceof ForwardInnerAlertException) {
-                return ApiResponses.fail((RuntimeException) cause);
+                throw (RuntimeException) cause; // Ném lại để Retry tiếp tục xử lý
             }
-            return ApiResponses.fail(
-                    new ResponseException(ServiceUnavailableError.STORAGE_SERVICE_UNAVAILABLE_ERROR));
+            throw new ResponseException(ServiceUnavailableError.STORAGE_SERVICE_UNAVAILABLE_ERROR); // Để CircuitBreaker bắt được
         }
 
         @Override
         public ApiResponses<FileResponse> updateFile(int fileId, MultipartFile file) {
             if (cause instanceof ForwardInnerAlertException) {
-                return ApiResponses.fail((RuntimeException) cause);
+                throw (RuntimeException) cause; // Ném lại để Retry tiếp tục xử lý
             }
-            return ApiResponses.fail(
-                    new ResponseException(ServiceUnavailableError.STORAGE_SERVICE_UNAVAILABLE_ERROR));
+            throw new ResponseException(ServiceUnavailableError.STORAGE_SERVICE_UNAVAILABLE_ERROR); // Để CircuitBreaker bắt được
         }
 
         @Override
         public ApiResponses<Void> deleteFile(int fileId) {
             if (cause instanceof ForwardInnerAlertException) {
-                return ApiResponses.fail((RuntimeException) cause);
+                throw (RuntimeException) cause; // Ném lại để Retry tiếp tục xử lý
             }
-            return ApiResponses.fail(
-                    new ResponseException(ServiceUnavailableError.STORAGE_SERVICE_UNAVAILABLE_ERROR));
+            throw new ResponseException(ServiceUnavailableError.STORAGE_SERVICE_UNAVAILABLE_ERROR); // Để CircuitBreaker bắt được
         }
 
         @Override
         public ApiResponses<FileResponse> getFile(int fileId) {
             if (cause instanceof ForwardInnerAlertException) {
-                return ApiResponses.fail((RuntimeException) cause);
+                throw (RuntimeException) cause; // Ném lại để Retry tiếp tục xử lý
             }
-            return ApiResponses.fail(
-                    new ResponseException(ServiceUnavailableError.STORAGE_SERVICE_UNAVAILABLE_ERROR));
+            throw new ResponseException(ServiceUnavailableError.STORAGE_SERVICE_UNAVAILABLE_ERROR); // Để CircuitBreaker bắt được
         }
 
         @Override
         public PageApiResponse<List<FileResponse>> searchFiles(FileSearchRequest fileSearchRequest) {
             if (cause instanceof ForwardInnerAlertException) {
-                return PageApiResponse.fail((RuntimeException) cause);
+                throw (RuntimeException) cause; // Ném lại để Retry tiếp tục xử lý
             }
-            return PageApiResponse.fail(
-                    new ResponseException(ServiceUnavailableError.STORAGE_SERVICE_UNAVAILABLE_ERROR));
+            throw new ResponseException(ServiceUnavailableError.STORAGE_SERVICE_UNAVAILABLE_ERROR); // Để CircuitBreaker bắt được
         }
 
         @Override
         public ApiResponses<Void> testRetry() {
             if (cause instanceof ForwardInnerAlertException) {
-                return ApiResponses.fail((RuntimeException) cause);
+                throw (RuntimeException) cause; // Ném lại để Retry tiếp tục xử lý
             }
-            return ApiResponses.fail(
-                    new ResponseException(ServiceUnavailableError.STORAGE_SERVICE_UNAVAILABLE_ERROR));
+            throw new ResponseException(ServiceUnavailableError.STORAGE_SERVICE_UNAVAILABLE_ERROR); // Để CircuitBreaker bắt được
         }
     }
 }

@@ -1,11 +1,10 @@
-package com.evo.gateway;
+package com.sever.config;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-@EnableConfigServer
-class GatewayApplicationTests {
+class ConfigApplicationTests {
 
 	@Test
 	void contextLoads() {
