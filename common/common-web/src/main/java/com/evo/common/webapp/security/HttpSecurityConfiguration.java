@@ -53,7 +53,7 @@ public class HttpSecurityConfiguration {
             "/api/client/authorities/**",
             "/api/client/token/**",
             "/api/uploads/**",
-            "/actuator/health",
+            "/actuator/**",
             "/swagger-ui/**",
             "/v3/api-docs/**",
             "/swagger-config",
@@ -63,7 +63,9 @@ public class HttpSecurityConfiguration {
             "/webjars/**",
             "/swagger-resources/**",
             "/swagger-doc/**",
-            "/api/test-retry"
+            "/api/test-retry",
+            "api/test/refresh",
+            "/api/config/reload"
     };
 
     public HttpSecurityConfiguration(ActionLogFilter actionLogFilter,
