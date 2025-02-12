@@ -35,9 +35,7 @@ public interface StorageServiceClient {
 
     @PostMapping(value = "/api/file",
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    PageApiResponse<List<FileResponse>> searchFiles(@RequestBody FileSearchRequest fileSearchRequest);git remote add origin git@github.com:DatP2K3/iam_common_storage.git
-    git branch -M main
-    git push -u origin main
+    PageApiResponse<List<FileResponse>> searchFiles(@RequestBody FileSearchRequest fileSearchRequest);
     @CircuitBreaker(name = "default")
     @Retry(name = "default")
     @GetMapping("/api/file/test-retry")
