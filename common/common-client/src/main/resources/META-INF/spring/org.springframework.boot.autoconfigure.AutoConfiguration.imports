@@ -1,1 +1,5 @@
 com.evo.common.client.iam.IamClientFallback
+com.evo.common.client.iam.IamNoTokenClientFallback
+com.evo.common.client.iam.IamNoTokenClient
+com.evo.common.client.iam.IamClient
+

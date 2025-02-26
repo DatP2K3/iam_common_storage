@@ -32,14 +32,5 @@ public class IamNoTokenClientFallback implements FallbackFactory<IamNoTokenClien
             return ApiResponses.fail(
                     new ResponseException(ServiceUnavailableError.IAM_SERVICE_UNAVAILABLE_ERROR));
         }
-
-        @Override
-        public ApiResponses<String> getClientToken(String clientId, String clientSecret) {
-            if (cause instanceof ForwardInnerAlertException) {
-                return ApiResponses.fail((RuntimeException) cause);
-            }
-            return ApiResponses.fail(
-                    new ResponseException(ServiceUnavailableError.IAM_SERVICE_UNAVAILABLE_ERROR));
-        }
     }
 }
