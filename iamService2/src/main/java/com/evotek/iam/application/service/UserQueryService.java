@@ -9,7 +9,8 @@ import java.util.List;
 
 public interface UserQueryService {
     UserDTO getUserInfo(String username);
-    PageApiResponse<List<UserDTO>> search(SearchUserRequest searchUserRequest);
+    Long totalUsers(SearchUserRequest request);
+    List<UserDTO> search(SearchUserRequest searchUserRequest);
     void exportUserListToExcel(SearchUserRequest searchUserRequest);
     UserAuthority getUserAuthority(String username);
     UserAuthority getClientAuthority(String clientId);

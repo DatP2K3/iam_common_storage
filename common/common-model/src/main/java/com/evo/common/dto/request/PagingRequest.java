@@ -1,4 +1,4 @@
-package com.evotek.iam.application.dto.request;
+package com.evo.common.dto.request;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;

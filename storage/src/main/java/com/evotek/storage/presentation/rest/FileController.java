@@ -15,14 +15,14 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/file")
+@RequestMapping("/api")// đổi api thôi
 @RequiredArgsConstructor
 public class FileController {
     private final FileCommandService fileCommandService;
     private final FileQueryService fileQueryService;
 
     @PreAuthorize("hasPermission(null, 'file.create')")
-    @PostMapping("/upload")
+    @PostMapping("/file/upload")
     public ApiResponses<List<FileResponse>> storeFile(@RequestPart List<MultipartFile> files,  @RequestParam boolean isPublic, @RequestParam String description) {
         List<FileResponse> fileResponses = fileCommandService.storeFile(files, isPublic, description);
         return ApiResponses.<List<FileResponse>>builder()

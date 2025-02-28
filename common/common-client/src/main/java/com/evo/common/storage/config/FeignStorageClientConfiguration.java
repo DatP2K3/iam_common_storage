@@ -1,4 +1,4 @@
-package com.evotek.iam.application.configuration;
+package com.evo.common.storage.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

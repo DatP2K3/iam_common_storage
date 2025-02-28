@@ -1,12 +1,15 @@
 package com.evotek.iam.infrastructure.domainrepository;
 
 import com.evotek.iam.domain.User;
+import com.evotek.iam.domain.UserActivityLog;
 import com.evotek.iam.domain.UserRole;
 import com.evotek.iam.domain.query.SearchUserQuery;
 import com.evotek.iam.domain.repository.UserDomainRepository;
 import com.evotek.iam.infrastructure.persistence.entity.*;
+import com.evotek.iam.infrastructure.persistence.mapper.UserActivityLogEntityMapper;
 import com.evotek.iam.infrastructure.persistence.mapper.UserEntityMapper;
 import com.evotek.iam.infrastructure.persistence.mapper.UserRoleEntityMapper;
+import com.evotek.iam.infrastructure.persistence.repository.UserActivityLogEntityRepository;
 import com.evotek.iam.infrastructure.persistence.repository.UserEntityRepository;
 import com.evotek.iam.infrastructure.persistence.repository.UserRoleEntityRepository;
 import com.evotek.iam.infrastructure.support.exception.AuthErrorCode;
@@ -26,16 +29,22 @@ public class UserDomainRepositoryImpl extends AbstractDomainRepository<User, Use
     private final UserEntityRepository userEntityRepository;
     private final UserRoleEntityRepository userRoleEntityRepository;
     private final UserRoleEntityMapper userRoleEntityMapper;
+    private final UserActivityLogEntityRepository userActivityLogEntityRepository;
+    private final UserActivityLogEntityMapper userActivityLogEntityMapper;
 
     public UserDomainRepositoryImpl(UserEntityRepository userEntityRepository,
                                     UserEntityMapper userEntityMapper,
                                     UserRoleEntityRepository userRoleEntityRepository,
-                                    UserRoleEntityMapper userRoleEntityMapper) {
+                                    UserRoleEntityMapper userRoleEntityMapper,
+                                    UserActivityLogEntityRepository userActivityLogEntityRepository,
+                                    UserActivityLogEntityMapper userActivityLogEntityMapper) {
         super(userEntityRepository, userEntityMapper);
         this.userEntityRepository = userEntityRepository;
         this.userEntityMapper = userEntityMapper;
         this.userRoleEntityRepository = userRoleEntityRepository;
         this.userRoleEntityMapper = userRoleEntityMapper;
+        this.userActivityLogEntityRepository = userActivityLogEntityRepository;
+        this.userActivityLogEntityMapper = userActivityLogEntityMapper;
     }
 
     @Override
@@ -51,11 +60,19 @@ public class UserDomainRepositoryImpl extends AbstractDomainRepository<User, Use
         UserRole userRole = domainModel.getUserRole();
         UserRoleEntity userRoleEntity = userRoleEntityMapper.toEntity(userRole);
         userRoleEntityRepository.save(userRoleEntity);
+        UserActivityLog userActivityLog = domainModel.getUserActivityLog();
+        UserActivityLogEntity userActivityLogEntity = userActivityLogEntityMapper.toEntity(userActivityLog);
+        userActivityLogEntityRepository.save(userActivityLogEntity);
         return userEntityMapper.toDomainModel(userEntityRepository.save(userEntity));
     }
 
     @Override
-    public User findByUsername(String username) {
+    public User getById(UUID uuid) {
+        return null;
+    }
+
+    @Override
+    public User getByUsername(String username) {
         UserEntity userEntity = userEntityRepository.findByUsername(username).orElseThrow(() -> new AuthException(AuthErrorCode.USER_NOT_EXISTED));
         return this.enrich(userEntityMapper.toDomainModel(userEntity));
     }
@@ -67,9 +84,7 @@ public class UserDomainRepositoryImpl extends AbstractDomainRepository<User, Use
         Map<UUID, UserRole> userRoleMap = userRoleEntityRepository.findByUserIdIn(userIds).stream()
                 .map(userRoleEntityMapper::toDomainModel)
                 .collect(Collectors.toMap(UserRole::getUserId, userRole -> userRole));
-        users.forEach(user -> {
-            user.setUserRole(userRoleMap.getOrDefault(user.getSelfUserID(), new UserRole()));
-        });
+        users.forEach(user -> user.setUserRole(userRoleMap.getOrDefault(user.getSelfUserID(), new UserRole())));
         return users;
     }
 

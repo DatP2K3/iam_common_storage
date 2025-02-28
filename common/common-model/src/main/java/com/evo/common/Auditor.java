@@ -1,8 +1,9 @@
-package com.evotek.iam.domain;
+package com.evo.common;
 
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 @EqualsAndHashCode(callSuper = false)
@@ -14,5 +15,5 @@ import java.time.LocalDateTime;
 public class Auditor {
     protected String createdBy;
     protected String lastModifiedBy;
-    protected LocalDateTime createdAt;
+    protected Instant createdAt;
 }

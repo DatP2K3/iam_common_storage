@@ -19,7 +19,6 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Repository
@@ -64,6 +63,12 @@ public class RoleDomainRepositoryImpl extends AbstractDomainRepository<Role, Rol
         return roleEntityMapper.toDomainModel(roleEntityRepository.save(roleEntity));
     }
 
+    @Override
+    public Role getById(UUID uuid) {
+        RoleEntity roleEntity =  roleEntityRepository.findById(uuid).orElseThrow(() -> new AuthException(AuthErrorCode.ROLE_NOT_EXISTED));
+        return enrich(roleEntityMapper.toDomainModel(roleEntity));
+    }
+
 
     @Override
     public Role findByName(String name) {
@@ -76,14 +81,14 @@ public class RoleDomainRepositoryImpl extends AbstractDomainRepository<Role, Rol
         if (roles.isEmpty()) return roles;
 
         List<UUID> roleIds = roles.stream().map(Role::getId).toList();
-        Map<UUID, List<RolePermission>> rolePermissionMap = rolePermissionEntityRepository.findByRoleIdIn(roleIds)
+        Map<UUID, List<RolePermission>> rolePermissionMap = rolePermissionEntityRepository.findByRoleIdInAndDeletedFalse(roleIds)
                 .stream()
                 .collect(Collectors.groupingBy(
                         RolePermissionEntity::getRoleId,
                         Collectors.mapping(rolePermissionEntityMapper::toDomainModel, Collectors.toList())
                 ));
 
-        roles.forEach(role -> role.setRolePermissions(rolePermissionMap.getOrDefault(role.getId(), Collections.emptyList())));
+        roles.forEach(role -> role.setRolePermissions(new ArrayList<>(rolePermissionMap.getOrDefault(role.getId(), Collections.emptyList()))));
         return roles;
     }
 }

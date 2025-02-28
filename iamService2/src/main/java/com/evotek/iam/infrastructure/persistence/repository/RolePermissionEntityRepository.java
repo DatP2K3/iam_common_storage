@@ -7,6 +7,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface RolePermissionEntityRepository extends JpaRepository<RolePermissionEntity, UUID> {
-    List<RolePermissionEntity> findByRoleIdIn(List<UUID> roleIds);
+    List<RolePermissionEntity> findByRoleIdInAndDeletedFalse(List<UUID> roleIds);
     List<RolePermissionEntity> findByRoleId(UUID id);
 }

@@ -11,7 +11,6 @@ import com.evotek.iam.domain.UserActivityLog;
 import com.evotek.iam.domain.command.LoginCmd;
 import com.evotek.iam.domain.command.VerifyOtpCmd;
 import com.evotek.iam.domain.command.WriteLogCmd;
-import com.evotek.iam.domain.repository.UserActivityLogDomainRepository;
 import com.evotek.iam.domain.repository.UserDomainRepository;
 import com.evotek.iam.infrastructure.adapter.email.EmailService;
 import com.evotek.iam.infrastructure.support.exception.AuthErrorCode;
@@ -55,7 +54,6 @@ public class SelfIDPAuthCommandServiceImpl implements AuthServiceCommand {
     private final TokenProvider tokenProvider;
     private final KeycloakIdentityClient keycloakIdentityClient;
     private final CommandMapper commandMapper;
-    private final UserActivityLogDomainRepository userActivityLogDomainRepository;
     private final String INVALID_REFRESH_TOKEN_CACHE = "invalid-refresh-token";
     private final String INVALID_TOKEN_CACHE = "invalid-access-token";
 
@@ -101,16 +99,13 @@ public class SelfIDPAuthCommandServiceImpl implements AuthServiceCommand {
     public TokenDTO authenticate(LoginRequest loginRequest) {
         LoginCmd loginCmd = commandMapper.from(loginRequest);
         User user = userDomainRepository
-                .findByUsername((loginCmd.getUsername()));
+                .getByUsername((loginCmd.getUsername()));
         boolean authenticated = passwordEncoder.matches(loginRequest.getPassword(), user.getPassword());
         if (!authenticated) throw new AuthException(AuthErrorCode.UNAUTHENTICATED);
         SecureRandom random = new SecureRandom();
         int otp = random.nextInt(900000) + 100000;
         redisTemplate.opsForValue().set(String.valueOf(otp), user.getUsername(), 300, TimeUnit.SECONDS);
         emailService.sendMailOtp(user.getEmail(), String.valueOf(otp));
-        WriteLogCmd logCmd = commandMapper.from("Login");
-        UserActivityLog userActivityLog = new UserActivityLog(logCmd);
-        userActivityLogDomainRepository.save(userActivityLog);
         return null;
     }
 
@@ -124,10 +119,14 @@ public class SelfIDPAuthCommandServiceImpl implements AuthServiceCommand {
             throw new AuthException(AuthErrorCode.UNAUTHENTICATED);
         }
         User user = userDomainRepository
-                .findByUsername((cmd.getUsername()));
+                .getByUsername((cmd.getUsername()));
         redisTemplate.delete(cmd.getOtp());
         var accessToken = generateToken(user, false, false);
         var refreshToken = generateToken(user, false, true);
+        WriteLogCmd logCmd = commandMapper.from("Login");
+        UserActivityLog userActivityLog = new UserActivityLog(logCmd);
+        user.setUserActivityLog(userActivityLog);
+        userDomainRepository.save(user);
         return TokenDTO.builder().accessToken(accessToken).refreshToken(refreshToken).build();
     }
 
@@ -138,16 +137,19 @@ public class SelfIDPAuthCommandServiceImpl implements AuthServiceCommand {
             if (token != null && token.startsWith("Bearer ")) {
                 token = token.substring(7);
             }
-            var signedJWT_access = verifyToken(token);
-            var access_expiryTimeMillis = signedJWT_access.getJWTClaimsSet().getExpirationTime().getTime();
+            var signedJWT = verifyToken(token);
+            var access_expiryTimeMillis = signedJWT.getJWTClaimsSet().getExpirationTime().getTime();
             long currentTimeMillis = System.currentTimeMillis();
             long access_remainingTimeMillis = access_expiryTimeMillis - currentTimeMillis;
             long refresh_remainingTimeMillis = currentTimeMillis + REFRESHABLE_DURATION * 1000;
             addAccessTokenToBlacklist(token, access_remainingTimeMillis);
             addRefreshTokenToBlacklist(token, refresh_remainingTimeMillis);
+            UUID userId = UUID.fromString(signedJWT.getJWTClaimsSet().getClaim("userId").toString());
+            User user = userDomainRepository.getById(userId);
             WriteLogCmd cmd = commandMapper.from("Logout");
             UserActivityLog userActivityLog = new UserActivityLog(cmd);
-            userActivityLogDomainRepository.save(userActivityLog);
+            user.setUserActivityLog(userActivityLog);
+            userDomainRepository.save(user);
         } catch (FeignException exception) {
             throw errorNormalizer.handleKeyCloakException(exception);
         } catch (ParseException e) {
@@ -160,7 +162,7 @@ public class SelfIDPAuthCommandServiceImpl implements AuthServiceCommand {
         try {
             var signedJWT = verifyToken(refreshToken);
             String username = signedJWT.getJWTClaimsSet().getSubject();
-            User user = userDomainRepository.findByUsername(username);
+            User user = userDomainRepository.getByUsername(username);
             var accessToken = generateToken(user, false, false);
             return TokenDTO.builder().accessToken(accessToken).refreshToken(refreshToken).build();
         } catch (ParseException e) {
@@ -171,7 +173,7 @@ public class SelfIDPAuthCommandServiceImpl implements AuthServiceCommand {
     @Override
     public void requestPasswordReset(String username, ResetKeycloakPasswordCmd resetKeycloakPasswordCmd) {
         try {
-            User user = userDomainRepository.findByUsername(username);
+            User user = userDomainRepository.getByUsername(username);
             String token = generateToken(user, true, false);
             String resetLink = "http://127.0.0.1:5500/resetPassword.html?token=" + token;
             emailService.sendMailForResetPassWord(user.getEmail(), resetLink);
@@ -210,10 +212,9 @@ public class SelfIDPAuthCommandServiceImpl implements AuthServiceCommand {
         try {
             SignedJWT signedJWT = verifyToken(token);
             String username = signedJWT.getJWTClaimsSet().getSubject();
-            User user = userDomainRepository.findByUsername(username);
-            user.setPassword(passwordEncoder.encode(resetKeycloakPasswordCmd.getValue()));
-            userDomainRepository.save(user);
-            emailService.sendMailAlert(user.getEmail(), "change_password");
+            User user = userDomainRepository.getByUsername(username);
+            user.changePassword(passwordEncoder.encode(resetKeycloakPasswordCmd.getValue()));
+
             var keycloakToken = keycloakIdentityClient.getToken(GetTokenRequest.builder()
                     .grant_type("client_credentials")
                     .client_id(clientId)
@@ -223,7 +224,10 @@ public class SelfIDPAuthCommandServiceImpl implements AuthServiceCommand {
             keycloakIdentityClient.resetPassword("Bearer " + keycloakToken.getAccessToken(), user.getProviderId().toString(), resetKeycloakPasswordCmd);
             WriteLogCmd cmd = commandMapper.from("Change password");
             UserActivityLog userActivityLog = new UserActivityLog(cmd);
-            userActivityLogDomainRepository.save(userActivityLog);
+            user.setUserActivityLog(userActivityLog);
+            userDomainRepository.save(user);
+            emailService.sendMailAlert(user.getEmail(), "change_password");
+
         } catch (Exception ex) {
             throw new AuthException(AuthErrorCode.UNCATEGORIZED_EXCEPTION);
         }

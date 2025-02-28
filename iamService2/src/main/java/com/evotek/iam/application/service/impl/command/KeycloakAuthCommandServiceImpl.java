@@ -3,14 +3,16 @@ package com.evotek.iam.application.service.impl.command;
 import com.evotek.iam.application.dto.request.LoginRequest;
 import com.evotek.iam.application.dto.request.identityKeycloak.LogoutRequest;
 import com.evotek.iam.application.dto.request.identityKeycloak.RefreshTokenRequest;
+import com.evotek.iam.domain.UserActivityLog;
 import com.evotek.iam.domain.command.ResetKeycloakPasswordCmd;
 import com.evotek.iam.application.dto.request.identityKeycloak.GetTokenRequest;
 import com.evotek.iam.application.dto.response.TokenDTO;
 import com.evotek.iam.application.mapper.CommandMapper;
 import com.evotek.iam.domain.User;
-import com.evotek.iam.domain.UserActivityLog;
+//import com.evotek.iam.domain.UserActivityLog;
+//import com.evotek.iam.domain.command.WriteLogCmd;
+//import com.evotek.iam.domain.repository.UserActivityLogDomainRepository;
 import com.evotek.iam.domain.command.WriteLogCmd;
-import com.evotek.iam.domain.repository.UserActivityLogDomainRepository;
 import com.evotek.iam.domain.repository.UserDomainRepository;
 import com.evotek.iam.infrastructure.adapter.email.EmailService;
 import com.evotek.iam.infrastructure.support.exception.AuthErrorCode;
@@ -40,7 +42,6 @@ public class KeycloakAuthCommandServiceImpl implements AuthServiceCommand {
     private final EmailService emailService;
     private final UserDomainRepository userDomainRepository;
     private final CommandMapper commandMapper;
-    private final UserActivityLogDomainRepository userActivityLogDomainRepository;
 
     @Value("${idp.client-id}")
     private String clientId;
@@ -58,9 +59,12 @@ public class KeycloakAuthCommandServiceImpl implements AuthServiceCommand {
                                 .username(loginRequest.getUsername())
                                 .password(loginRequest.getPassword())
                                 .build());
+
+            User user = userDomainRepository.getByUsername(loginRequest.getUsername());
             WriteLogCmd logCmd = commandMapper.from("Login");
             UserActivityLog userActivityLog = new UserActivityLog(logCmd);
-            userActivityLogDomainRepository.save(userActivityLog);
+            user.setUserActivityLog(userActivityLog);
+            userDomainRepository.save(user);
             return tokenDTO;
         } catch (FeignException exception) {
             throw errorNormalizer.handleKeyCloakException(exception);
@@ -84,9 +88,13 @@ public class KeycloakAuthCommandServiceImpl implements AuthServiceCommand {
                     .client_secret(clientSecret)
                     .refresh_token(refreshToken)
                     .build());
-            WriteLogCmd logCmd = commandMapper.from("Logout");
-            UserActivityLog userActivityLog = new UserActivityLog(logCmd);
-            userActivityLogDomainRepository.save(userActivityLog);
+            String username = signedJWT.getJWTClaimsSet().getStringClaim("preferred_username");
+
+            User user = userDomainRepository.getByUsername(username);
+            WriteLogCmd cmd = commandMapper.from("Logout");
+            UserActivityLog userActivityLog = new UserActivityLog(cmd);
+            user.setUserActivityLog(userActivityLog);
+            userDomainRepository.save(user);
         } catch (FeignException exception) {
             throw errorNormalizer.handleKeyCloakException(exception);
         } catch (ParseException e) {
@@ -107,7 +115,7 @@ public class KeycloakAuthCommandServiceImpl implements AuthServiceCommand {
     @Override
     public void requestPasswordReset(String username, ResetKeycloakPasswordCmd resetKeycloakPasswordCmd) {
         try {
-            User user = userDomainRepository.findByUsername(username);
+            User user = userDomainRepository.getByUsername(username);
             String userId = user.getProviderId().toString();
             var token = keycloakIdentityClient.getToken(GetTokenRequest.builder()
                     .grant_type("client_credentials")
@@ -117,12 +125,13 @@ public class KeycloakAuthCommandServiceImpl implements AuthServiceCommand {
                     .build());
 
             keycloakIdentityClient.resetPassword("Bearer " + token.getAccessToken(), userId, resetKeycloakPasswordCmd);
-            user.setPassword(passwordEncoder.encode(resetKeycloakPasswordCmd.getValue()));
-            userDomainRepository.save(user);
-            emailService.sendMailAlert(user.getEmail(), "change_password");
+            user.changePassword(passwordEncoder.encode(resetKeycloakPasswordCmd.getValue()));
+
             WriteLogCmd logCmd = commandMapper.from("Change password");
             UserActivityLog userActivityLog = new UserActivityLog(logCmd);
-            userActivityLogDomainRepository.save(userActivityLog);
+            user.setUserActivityLog(userActivityLog);
+            userDomainRepository.save(user);
+            emailService.sendMailAlert(user.getEmail(), "change_password");
         } catch (FeignException e) {
             throw errorNormalizer.handleKeyCloakException(e);
         }

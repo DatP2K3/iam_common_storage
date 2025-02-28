@@ -1,4 +1,4 @@
-package com.evotek.iam.application.dto.request;
+package com.evo.common.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

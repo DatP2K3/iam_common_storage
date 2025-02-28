@@ -9,16 +9,14 @@ import com.evotek.iam.domain.UserRole;
 import com.evotek.iam.domain.command.*;
 import com.evotek.iam.application.dto.response.UserDTO;
 import com.evotek.iam.application.mapper.CommandMapper;
-import com.evotek.iam.application.service.FileService;
+import com.evotek.iam.infrastructure.adapter.storage.FileService;
 import com.evotek.iam.infrastructure.adapter.email.EmailService;
 import com.evotek.iam.infrastructure.adapter.keycloak.KeycloakCommandClient;
 import com.evotek.iam.infrastructure.adapter.keycloak.KeycloakQueryClient;
 import com.evotek.iam.application.service.UserCommandService;
 import com.evotek.iam.domain.Role;
 import com.evotek.iam.domain.User;
-import com.evotek.iam.domain.UserActivityLog;
 import com.evotek.iam.domain.repository.RoleDomainRepository;
-import com.evotek.iam.domain.repository.UserActivityLogDomainRepository;
 import com.evotek.iam.domain.repository.UserDomainRepository;
 import com.evotek.iam.infrastructure.adapter.keycloak.KeycloakIdentityClient;
 import com.evotek.iam.infrastructure.support.exception.*;
@@ -51,7 +49,6 @@ public class UserCommandServiceImpl implements UserCommandService {
     private final ErrorNormalizer errorNormalizer;
     private final KeycloakQueryClient keycloakQueryClient;
     private final KeycloakIdentityClient keycloakIdentityClient;
-    private final UserActivityLogDomainRepository userActivityLogDomainRepository;
     private final EmailService emailService;
     private final FileService fileService;
     @Value("${auth.keycloak-enabled}") boolean keycloakEnabled;
@@ -102,7 +99,7 @@ public class UserCommandServiceImpl implements UserCommandService {
     public void changePassword(String username, ChangePasswordRequest request) {
         ChangePasswordCmd changePasswordCmd = commandMapper.from(request);
 
-        User user = userDomainRepository.findByUsername(username);
+        User user = userDomainRepository.getByUsername(username);
         UUID keycloakUserId = user.getProviderId();
 
         String token = keycloakQueryClient.getClientToken();
@@ -114,10 +111,6 @@ public class UserCommandServiceImpl implements UserCommandService {
             userDomainRepository.save(user);
 
             emailService.sendMailAlert(user.getEmail(), "change_password");
-
-            WriteLogCmd logCmd = commandMapper.from("Login");
-            UserActivityLog userActivityLog = new UserActivityLog(logCmd);
-            userActivityLogDomainRepository.save(userActivityLog);
         } else {
             throw new AuthException(AuthErrorCode.INVALID_PASSWORD);
         }
@@ -125,15 +118,11 @@ public class UserCommandServiceImpl implements UserCommandService {
 
     @Override
     public UUID changeAvatar(String username, List<MultipartFile> files) {
-        User user = userDomainRepository.findByUsername(username);
+        User user = userDomainRepository.getByUsername(username);
         FileResponse fileResponse = fileService.uploadFile(files, true, "avatar").getFirst();
         UUID avatarId = fileResponse.getId();
         user.changeAvatar(avatarId);
         userDomainRepository.save(user);
-
-        WriteLogCmd logCmd = commandMapper.from("Change Avatar");
-        UserActivityLog userActivityLog = new UserActivityLog(logCmd);
-        userActivityLogDomainRepository.save(userActivityLog);
         return avatarId;
     }
 
@@ -246,10 +235,6 @@ public class UserCommandServiceImpl implements UserCommandService {
                     userDTOS.add(createDefaultUser(request));
                 }
             }
-
-            WriteLogCmd logCmd = commandMapper.from("Import user");
-            UserActivityLog userActivityLog = new UserActivityLog(logCmd);
-            userActivityLogDomainRepository.save(userActivityLog);
             return userDTOS;
         } catch (IOException e) {
             throw new AppException(AppErrorCode.FILE_NOT_FOUND);
@@ -259,26 +244,18 @@ public class UserCommandServiceImpl implements UserCommandService {
     @Override
     public UserDTO updateUser(String username, UpdateUserRequest updateUserRequest) {
         UpdateUserCmd cmd = commandMapper.from(updateUserRequest);
-        User user = userDomainRepository.findByUsername(username);
+        User user = userDomainRepository.getByUsername(username);
         user.update(cmd);
-
-        WriteLogCmd logCmd = commandMapper.from("Update info");
-        UserActivityLog userActivityLog = new UserActivityLog(logCmd);
-        userActivityLogDomainRepository.save(userActivityLog);
         return userDTOMapper.domainModelToDTO(userDomainRepository.save(user));
     }
 
     @Override
     public void lockUser(String username, boolean enabled) {
-        User user = userDomainRepository.findByUsername(username);
+        User user = userDomainRepository.getByUsername(username);
         user.setLocked(!enabled);
         userDomainRepository.save(user);
         String token = keycloakQueryClient.getClientToken();
         keycloakIdentityClient.lockUser("Bearer " + token, user.getProviderId().toString(), LockUserCmd.builder().enabled(enabled).build());
-
-        WriteLogCmd logCmd = commandMapper.from("Lock user");
-        UserActivityLog userActivityLog = new UserActivityLog(logCmd);
-        userActivityLogDomainRepository.save(userActivityLog);
     }
 
 }

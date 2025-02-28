@@ -1,7 +1,6 @@
 package com.evotek.iam.application.service.impl.query;
 
 import com.evo.common.UserAuthority;
-import com.evo.common.dto.response.PageApiResponse;
 import com.evotek.iam.application.dto.mapper.UserDTOMapper;
 import com.evotek.iam.application.dto.request.SearchUserRequest;
 import com.evotek.iam.application.dto.response.UserDTO;
@@ -14,8 +13,6 @@ import com.evotek.iam.domain.repository.RoleDomainRepository;
 import com.evotek.iam.domain.repository.UserDomainRepository;
 import com.evotek.iam.infrastructure.support.exception.AppErrorCode;
 import com.evotek.iam.infrastructure.support.exception.AppException;
-import com.evotek.iam.infrastructure.support.exception.AuthErrorCode;
-import com.evotek.iam.infrastructure.support.exception.AuthException;
 import lombok.RequiredArgsConstructor;
 import org.jxls.builder.JxlsOutput;
 import org.jxls.builder.JxlsOutputFile;
@@ -26,10 +23,7 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -42,38 +36,27 @@ public class UserQueryServiceImpl implements UserQueryService {
 
     @Override
     public UserDTO getUserInfo(String username) {
-        User user = userDomainRepository.findByUsername(username);
+        User user = userDomainRepository.getByUsername(username);
         return userDTOMapper.domainModelToDTO(user);
     }
 
     @Override
-    public PageApiResponse<List<UserDTO>> search(SearchUserRequest request) {
+    public Long totalUsers(SearchUserRequest request) {
+        SearchUserQuery searchUserQuery = queryMapper.from(request);
+        return userDomainRepository.count(searchUserQuery);
+    }
+
+    @Override
+    public List<UserDTO> search(SearchUserRequest request) {
         SearchUserQuery searchUserQuery = queryMapper.from(request);
         List<User> users = userDomainRepository.search(searchUserQuery);
-        Long totalUsers = userDomainRepository.count(searchUserQuery);
-        List <UserDTO> userDTOS = users.stream().map(userDTOMapper::domainModelToDTO).toList();
-        PageApiResponse.PageableResponse pageableResponse = PageApiResponse.PageableResponse.builder()
-                .pageSize(request.getPageSize())
-                .pageIndex(request.getPageIndex())
-                .totalElements(totalUsers)
-                .totalPages((int)(Math.ceil((double)totalUsers / request.getPageSize())))
-                .hasNext(request.getPageIndex() + request.getPageSize() < totalUsers)
-                .hasPrevious(request.getPageIndex() > 1).build();
-        return PageApiResponse.<List<UserDTO>>builder()
-                .data(userDTOS)
-                .success(true)
-                .code(200)
-                .pageable(pageableResponse)
-                .message("Search user successfully")
-                .timestamp(System.currentTimeMillis())
-                .status("OK")
-                .build();
+        return users.stream().map(userDTOMapper::domainModelToDTO).toList();
     }
 
     @Override
     public void exportUserListToExcel(SearchUserRequest searchUserRequest) {
-        PageApiResponse<List<UserDTO>> pageApiResponse = search(searchUserRequest);
-        List<User> users = pageApiResponse.getData().stream().map(userDTOMapper::dtoToDomainModel).toList();
+        List<UserDTO> userDTOS = search(searchUserRequest);
+        List<User> users = userDTOS.stream().map(userDTOMapper::dtoToDomainModel).toList();
         Map<String, Object> data = new HashMap<>();
         data.put("users", users);
         try (InputStream inputStream = new ClassPathResource("templates/user_template.xlsx").getInputStream()) {
@@ -89,9 +72,9 @@ public class UserQueryServiceImpl implements UserQueryService {
 
     @Override
     public UserAuthority getUserAuthority(String username) {
-        User user = userDomainRepository.findByUsername(username);
+        User user = userDomainRepository.getByUsername(username);
         UserRole userRole = user.getUserRole();
-        Role role = roleDomainRepository.findById(userRole.getRoleId()).orElseThrow(() -> new AuthException(AuthErrorCode.ROLE_NOT_EXISTED));
+        Role role = roleDomainRepository.getById(userRole.getRoleId());
         boolean isRoot = role.isRoot();
         List<Permission> permissions = roleDomainRepository.findPermissionByRoleId(userRole.getRoleId());
         List<String> grantedPermissions = List.of();

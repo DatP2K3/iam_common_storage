@@ -1,5 +1,6 @@
 package com.evotek.iam.infrastructure.persistence.entity;
 
+import com.evo.common.AuditEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedBy;
@@ -11,13 +12,13 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
+@EqualsAndHashCode(callSuper = false)
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "user_activity_logs")
-public class UserActivityLogEntity {
+public class UserActivityLogEntity extends AuditEntity {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -25,16 +26,4 @@ public class UserActivityLogEntity {
 
     @Column(name = "activity")
     private String activity;
-
-    @CreatedBy
-    @Column(name = "created_by", updatable = false)
-    private String createdBy;
-
-    @LastModifiedBy
-    @Column(name = "last_modified_by")
-    private String lastModifiedBy;
-
-    @CreatedDate
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
 }

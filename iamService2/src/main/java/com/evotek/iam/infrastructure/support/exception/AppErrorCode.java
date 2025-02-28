@@ -11,6 +11,7 @@ public enum AppErrorCode {
     PERMISSION_ASSIGNED_TO_ROLE(1021, "Permission assigned to role", HttpStatus.BAD_REQUEST),
     ROLE_NOT_FOUND(1022, "Role not found", HttpStatus.BAD_REQUEST),
     ROLE_PERMISSION_NOT_EXISTED(1023, "Role permission not existed", HttpStatus.BAD_REQUEST),
+    USER_ACTIVITY_LOG_NOT_FOUND(1024, "User activity log not found", HttpStatus.BAD_REQUEST),
     ;
 
     private final int code;

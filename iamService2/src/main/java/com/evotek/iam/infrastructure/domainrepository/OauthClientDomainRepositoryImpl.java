@@ -27,4 +27,9 @@ public class OauthClientDomainRepositoryImpl extends AbstractDomainRepository<Oa
         OauthClientEntity oauthClientEntity = repository.findByClientId(clientId).orElseThrow(() -> new AuthException(AuthErrorCode.INVALID_CLIENT_SECRET));
         return entityMapper.toDomainModel(oauthClientEntity);
     }
+
+    @Override
+    public OauthClient getById(UUID uuid) {
+        return entityMapper.toDomainModel(repository.findById(uuid).orElseThrow(() -> new AuthException(AuthErrorCode.UNAUTHENTICATED)));
+    }
 }

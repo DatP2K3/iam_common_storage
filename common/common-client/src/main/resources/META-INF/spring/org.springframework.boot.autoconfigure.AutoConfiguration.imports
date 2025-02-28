@@ -1,5 +1,5 @@
-com.evo.common.client.iam.IamClientFallback
-com.evo.common.client.iam.IamNoTokenClientFallback
-com.evo.common.client.iam.IamNoTokenClient
-com.evo.common.client.iam.IamClient
-
+com.evo.common.iam.client.IamClientFallback
+com.evo.common.iam.client.IamNoTokenClientFallback
+com.evo.common.iam.config.WebClientConfig
+com.evo.common.storage.client.StorageClientFallback
+com.evo.common.FeignClientAutoConfiguration

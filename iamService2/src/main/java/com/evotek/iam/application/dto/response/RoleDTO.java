@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -19,5 +20,5 @@ public class RoleDTO {
     private boolean isRoot;
     private String createdBy;
     private String lastModifiedBy;
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 }

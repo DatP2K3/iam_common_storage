@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
+//ném lên common
 public abstract class AbstractDomainRepository<D, E, ID> implements DomainRepository<D, ID> {
     protected final JpaRepository<E, ID> repository;
     protected final EntityMapper<D, E> entityMapper;
@@ -15,14 +15,6 @@ public abstract class AbstractDomainRepository<D, E, ID> implements DomainReposi
     public AbstractDomainRepository(JpaRepository<E, ID> repository, EntityMapper<D, E> entityMapper) {
         this.repository = repository;
         this.entityMapper = entityMapper;
-    }
-
-    @Override
-    public Optional<D> findById(ID id) {
-        Optional<E> entity = repository.findById(id);
-        String entityName = entity.getClass().getSimpleName();
-        System.out.println("entity: " + entityName);
-        return entity.map(entityMapper::toDomainModel).map(this::enrich);
     }
 
     @Override

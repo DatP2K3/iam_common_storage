@@ -8,7 +8,7 @@ import com.evotek.iam.application.dto.request.ChangePasswordRequest;
 import com.evotek.iam.application.dto.request.UpdateUserRequest;
 import com.evotek.iam.application.dto.request.SearchUserRequest;
 import com.evotek.iam.application.dto.response.UserDTO;
-import com.evotek.iam.application.service.FileService;
+import com.evotek.iam.infrastructure.adapter.storage.FileService;
 import com.evotek.iam.application.service.UserCommandService;
 import com.evotek.iam.application.service.UserQueryService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,6 +22,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -35,7 +36,7 @@ public class UserController {
 
     @PreAuthorize("hasPermission(null, 'user.admin')")
     @GetMapping("/users/authorities/{userId}")
-    public UserAuthority getUserAuthority(@PathVariable int userId) {
+    public UserAuthority getUserAuthority(@PathVariable UUID userId) {
         return null;
     }
 
@@ -180,7 +181,28 @@ public class UserController {
     @PreAuthorize("hasPermission(null, 'user.manage')")
     @GetMapping("/users/search")
     public PageApiResponse<List<UserDTO>> search(@RequestBody SearchUserRequest searchUserRequest) {
-        return userQueryService.search(searchUserRequest);
+        Long totalUsers = userQueryService.totalUsers(searchUserRequest);
+        List<UserDTO> userDTOS = Collections.emptyList();
+        if(totalUsers != 0) {
+            userDTOS = userQueryService.search(searchUserRequest);
+        }
+        PageApiResponse.PageableResponse pageableResponse = PageApiResponse.PageableResponse.builder()
+                .pageSize(searchUserRequest.getPageSize())
+                .pageIndex(searchUserRequest.getPageIndex())
+                .totalElements(totalUsers)
+                .totalPages((int)(Math.ceil((double)totalUsers / searchUserRequest.getPageSize())))
+                .hasNext(searchUserRequest.getPageIndex() + searchUserRequest.getPageSize() < totalUsers)
+                .hasPrevious(searchUserRequest.getPageIndex() > 1).build();
+
+        return PageApiResponse.<List<UserDTO>>builder()
+                .data(userDTOS)
+                .pageable(pageableResponse)
+                .success(true)
+                .code(200)
+                .message("Search user successfully")
+                .timestamp(System.currentTimeMillis())
+                .status("OK")
+                .build();
     }
 
 

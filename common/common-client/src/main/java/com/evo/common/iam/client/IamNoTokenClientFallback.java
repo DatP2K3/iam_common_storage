@@ -1,4 +1,4 @@
-package com.evo.common.client.iam;
+package com.evo.common.iam.client;
 
 import com.evo.common.UserAuthority;
 import com.evo.common.dto.response.ApiResponses;

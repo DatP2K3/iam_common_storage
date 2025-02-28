@@ -1,4 +1,4 @@
-package com.evo.common.config;
+package com.evo.common.iam.config;
 
 import com.evo.common.dto.response.ApiResponses;
 import feign.RequestInterceptor;

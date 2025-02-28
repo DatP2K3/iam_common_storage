@@ -1,4 +1,4 @@
-package com.evo.common.config;
+package com.evo.common.iam.client;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

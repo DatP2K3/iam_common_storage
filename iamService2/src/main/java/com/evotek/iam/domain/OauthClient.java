@@ -1,9 +1,9 @@
 package com.evotek.iam.domain;
 
+import com.evo.common.Auditor;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @EqualsAndHashCode(callSuper = false)

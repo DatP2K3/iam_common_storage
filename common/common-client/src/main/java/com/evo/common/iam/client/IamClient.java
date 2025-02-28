@@ -1,12 +1,14 @@
-package com.evo.common.client.iam;
+package com.evo.common.iam.client;
 
 import com.evo.common.UserAuthority;
-import com.evo.common.config.FeignClientConfiguration;
 import com.evo.common.dto.response.ApiResponses;
+import com.evo.common.iam.config.FeignClientConfiguration;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+
+import java.util.UUID;
 
 @FeignClient(
         url = "${app.iam.internal-url:}",
@@ -17,7 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 public interface IamClient { // Dùng để lấy thông tin về quyền của user
     @GetMapping("/api/users/authorities/{userId}")
     @LoadBalanced
-    ApiResponses<UserAuthority> getUserAuthority(@PathVariable int userId);
+    ApiResponses<UserAuthority> getUserAuthority(@PathVariable UUID userId);
 
     @GetMapping("/api/users/authorities-by-username/{username}")
     @LoadBalanced

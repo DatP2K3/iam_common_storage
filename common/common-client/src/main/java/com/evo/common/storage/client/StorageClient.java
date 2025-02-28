@@ -1,11 +1,11 @@
-package com.evotek.iam.infrastructure.adapter.storage;
+package com.evo.common.storage.client;
 
+import com.evo.common.dto.request.SearchFileRequest;
+import com.evo.common.dto.request.UpdateFileRequest;
+import com.evo.common.storage.config.FeignStorageClientConfiguration;
 import com.evo.common.dto.response.ApiResponses;
 import com.evo.common.dto.response.FileResponse;
 import com.evo.common.dto.response.PageApiResponse;
-import com.evotek.iam.application.configuration.FeignStorageClientConfiguration;
-import com.evotek.iam.application.dto.request.SearchFileRequest;
-import com.evotek.iam.application.dto.request.UpdateFileRequest;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -13,10 +13,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
-
 @FeignClient(name = "storage-service",
-        url = "${storage-service.url}",
-        contextId = "common-iam-with-token",
+        url = "${storage-service.url:}",
+        contextId = "common-storage-with-token",
         configuration = FeignStorageClientConfiguration.class,
         fallbackFactory = StorageClientFallback.class
     )

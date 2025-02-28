@@ -5,7 +5,7 @@ import com.evo.common.UserAuthority;
 import java.util.UUID;
 
 public interface AuthorityService {
-    UserAuthority getUserAuthority(int userId);
+    UserAuthority getUserAuthority(UUID userId);
 
     UserAuthority getUserAuthority(String username);
 

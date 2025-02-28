@@ -6,12 +6,8 @@ import com.evotek.iam.application.dto.response.RoleDTO;
 import com.evotek.iam.application.mapper.CommandMapper;
 import com.evotek.iam.application.service.RoleCommandService;
 import com.evotek.iam.domain.Role;
-import com.evotek.iam.domain.UserActivityLog;
 import com.evotek.iam.domain.command.*;
 import com.evotek.iam.domain.repository.RoleDomainRepository;
-import com.evotek.iam.domain.repository.UserActivityLogDomainRepository;
-import com.evotek.iam.infrastructure.support.exception.AppErrorCode;
-import com.evotek.iam.infrastructure.support.exception.AppException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,7 +19,6 @@ public class RoleCommandServiceImpl implements RoleCommandService {
     private final RoleDTOMapper roleDTOMapper;
     private final CommandMapper commandMapper;
     private final RoleDomainRepository roleDomainRepository;
-    private  final UserActivityLogDomainRepository userActivityLogDomainRepository;
 
     @Override
     @Transactional
@@ -31,10 +26,6 @@ public class RoleCommandServiceImpl implements RoleCommandService {
         CreateOrUpdateRoleCmd createOrUpdateRoleCmd = commandMapper.from(createOrUpdateRoleRequest);
         Role role = new Role(createOrUpdateRoleCmd);
         role = roleDomainRepository.save(role);
-
-        WriteLogCmd logCmd = commandMapper.from("Create role");
-        UserActivityLog userActivityLog = new UserActivityLog(logCmd);
-        userActivityLogDomainRepository.save(userActivityLog);
         return roleDTOMapper.domainModelToDTO(role);
     }
 
@@ -42,13 +33,9 @@ public class RoleCommandServiceImpl implements RoleCommandService {
     @Transactional
     public RoleDTO updateRole(CreateOrUpdateRoleRequest createOrUpdateRoleRequest) {
         CreateOrUpdateRoleCmd createOrUpdateRoleCmd = commandMapper.from(createOrUpdateRoleRequest);
-        Role role = roleDomainRepository.findById(createOrUpdateRoleCmd.getId()).orElseThrow(() -> new AppException(AppErrorCode.ROLE_NOT_FOUND));
+        Role role = roleDomainRepository.getById(createOrUpdateRoleCmd.getId());
         role.update(createOrUpdateRoleCmd);
         role = roleDomainRepository.save(role);
-
-        WriteLogCmd logCmd = commandMapper.from("Update role");
-        UserActivityLog userActivityLog = new UserActivityLog(logCmd);
-        userActivityLogDomainRepository.save(userActivityLog);
         return roleDTOMapper.domainModelToDTO(role);
     }
 }

@@ -24,5 +24,5 @@ public class UserDTO {
     private String district;
     private String city;
     private int yearsOfExperience;
-    private List<String> avatar;
+    private UUID avatarFileId;
 }

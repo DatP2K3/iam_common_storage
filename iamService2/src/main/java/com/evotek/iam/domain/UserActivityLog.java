@@ -1,5 +1,6 @@
 package com.evotek.iam.domain;
 
+import com.evo.common.Auditor;
 import com.evotek.iam.domain.command.WriteLogCmd;
 import lombok.*;
 import lombok.experimental.SuperBuilder;

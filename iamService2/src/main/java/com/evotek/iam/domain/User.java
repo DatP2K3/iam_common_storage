@@ -1,5 +1,6 @@
 package com.evotek.iam.domain;
 
+import com.evo.common.Auditor;
 import com.evotek.iam.domain.command.CreateUserCmd;
 import com.evotek.iam.domain.command.UpdateUserCmd;
 import com.evotek.iam.infrastructure.support.IdUtils;
@@ -33,6 +34,7 @@ public class User extends Auditor {
     private boolean locked;
     private String provider;
     private UserRole userRole;
+    private UserActivityLog userActivityLog;
 
     public User(CreateUserCmd cmd) {
         this.selfUserID = IdUtils.nextId();
@@ -87,6 +89,7 @@ public class User extends Auditor {
 
     public void changePassword(String newPassword) {
         this.password = newPassword;
+
     }
 
     public void changeAvatar(UUID fileId) {

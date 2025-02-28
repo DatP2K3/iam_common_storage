@@ -1,4 +1,4 @@
-package com.evo.common.client.iam;
+package com.evo.common.iam.client;
 
 import com.evo.common.UserAuthority;
 import com.evo.common.dto.response.ApiResponses;
@@ -8,6 +8,8 @@ import com.evo.common.exception.ResponseException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
+
+import java.util.UUID;
 
 @Component
 public class IamClientFallback implements FallbackFactory<IamClient> { // FallbackFactory: Dùng để xử lý khi gặp lỗi khi gọi api từ Iam Client
@@ -25,7 +27,7 @@ public class IamClientFallback implements FallbackFactory<IamClient> { // Fallba
         }
 
         @Override
-        public ApiResponses<UserAuthority> getUserAuthority(int userId) {
+        public ApiResponses<UserAuthority> getUserAuthority(UUID userId) {
             if (cause instanceof ForwardInnerAlertException) {
                 return ApiResponses.fail((RuntimeException) cause);
             }

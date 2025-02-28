@@ -8,7 +8,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 
 import java.util.Optional;
-
+//vứt ln common
 public class AuditorAwareImpl implements AuditorAware<String> {
     @Value("${auth.keycloak-enabled}")
     private boolean keycloakEnabled;

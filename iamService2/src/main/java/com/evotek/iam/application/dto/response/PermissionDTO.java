@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.LastModifiedBy;
 
+import java.time.Instant;
 import java.util.UUID;
 
 @Data
@@ -20,5 +21,5 @@ public class PermissionDTO {
     private String scope;
     private String createdBy;
     private String lastModifiedBy;
-    private String createdAt;
+    private Instant createdAt;
 }

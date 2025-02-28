@@ -1,10 +1,10 @@
-package com.evotek.iam.application.service;
+package com.evotek.iam.infrastructure.adapter.storage;
 
+import com.evo.common.dto.request.SearchFileRequest;
+import com.evo.common.dto.request.UpdateFileRequest;
+import com.evo.common.storage.client.StorageClient;
 import com.evo.common.dto.response.ApiResponses;
 import com.evo.common.dto.response.FileResponse;
-import com.evotek.iam.application.dto.request.SearchFileRequest;
-import com.evotek.iam.application.dto.request.UpdateFileRequest;
-import com.evotek.iam.infrastructure.adapter.storage.StorageClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,6 +16,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class FileServiceImpl implements FileService {
     private final StorageClient storageClient;
+
     @Override
     public List<FileResponse> uploadFile(List<MultipartFile> files, boolean isPublic, String description) {
         return storageClient.uploadFiles(files, isPublic, description).getData();

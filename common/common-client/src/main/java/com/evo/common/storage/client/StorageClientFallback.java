@@ -1,13 +1,13 @@
-package com.evotek.iam.infrastructure.adapter.storage;
+package com.evo.common.storage.client;
 
+import com.evo.common.dto.request.SearchFileRequest;
+import com.evo.common.dto.request.UpdateFileRequest;
 import com.evo.common.dto.response.ApiResponses;
 import com.evo.common.dto.response.FileResponse;
 import com.evo.common.dto.response.PageApiResponse;
 import com.evo.common.enums.ServiceUnavailableError;
 import com.evo.common.exception.ForwardInnerAlertException;
 import com.evo.common.exception.ResponseException;
-import com.evotek.iam.application.dto.request.SearchFileRequest;
-import com.evotek.iam.application.dto.request.UpdateFileRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
