@@ -1,11 +1,11 @@
 package com.evo.common.exception;
 
-
-import com.evo.common.dto.error.ResponseError;
-import lombok.Getter;
-
 import java.text.MessageFormat;
 import java.util.Objects;
+
+import com.evo.common.dto.error.ResponseError;
+
+import lombok.Getter;
 
 @Getter
 public class ResponseException extends RuntimeException {
@@ -20,13 +20,8 @@ public class ResponseException extends RuntimeException {
         this(message, cause, error, (Object) null);
     }
 
-    public ResponseException(
-            String message, Throwable cause, ResponseError error, Object... params) {
-        super(
-                Objects.nonNull(message)
-                        ? MessageFormat.format(message, params)
-                        : error.getMessage(),
-                cause);
+    public ResponseException(String message, Throwable cause, ResponseError error, Object... params) {
+        super(Objects.nonNull(message) ? MessageFormat.format(message, params) : error.getMessage(), cause);
         this.error = error;
         this.params = params == null ? new Object[0] : params;
     }
@@ -42,5 +37,4 @@ public class ResponseException extends RuntimeException {
     public ResponseException(String message, ResponseError error, Object... params) {
         this(message, null, error, params);
     }
-
 }

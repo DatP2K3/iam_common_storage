@@ -1,11 +1,12 @@
 package com.evo.common.webapp.security;
 
+import java.io.IOException;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -16,23 +17,28 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.io.IOException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class ForbiddenTokenFilter extends OncePerRequestFilter { // Filter này sẽ kiểm tra token có nằm trong danh sách token bị cấm không
+public class ForbiddenTokenFilter
+        extends OncePerRequestFilter { // Filter này sẽ kiểm tra token có nằm trong danh sách token bị cấm không
     private final TokenCacheService tokenCacheService;
 
     @Override
-    protected void doFilterInternal(@NonNull HttpServletRequest httpServletRequest, @NonNull HttpServletResponse httpServletResponse, @NonNull FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(
+            @NonNull HttpServletRequest httpServletRequest,
+            @NonNull HttpServletResponse httpServletResponse,
+            @NonNull FilterChain filterChain)
+            throws ServletException, IOException {
         log.info("ForbiddenTokenFilter");
         SecurityContext securityContext = SecurityContextHolder.getContext();
-        JwtAuthenticationToken authentication =
-                (JwtAuthenticationToken) securityContext.getAuthentication();
+        JwtAuthenticationToken authentication = (JwtAuthenticationToken) securityContext.getAuthentication();
         Jwt token = authentication.getToken();
-        if (tokenCacheService.isExisted(TokenCacheService.INVALID_TOKEN_CACHE, token.getTokenValue()) ||
-                tokenCacheService.isExisted(TokenCacheService.INVALID_REFRESH_TOKEN_CACHE, token.getTokenValue())) {
+        if (tokenCacheService.isExisted(TokenCacheService.INVALID_TOKEN_CACHE, token.getTokenValue())
+                || tokenCacheService.isExisted(TokenCacheService.INVALID_REFRESH_TOKEN_CACHE, token.getTokenValue())) {
             log.warn("Token is invalid");
             httpServletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             httpServletResponse.getWriter().write("Token is invalid");

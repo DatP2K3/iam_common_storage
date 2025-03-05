@@ -1,13 +1,17 @@
 package com.evo.common.webapp.config;
 
-import com.evo.common.webapp.support.CachedHttpServletRequestWrapper;
-import com.evo.common.webapp.support.SecurityUtils;
+import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.List;
+import java.util.Objects;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.extern.slf4j.Slf4j;
+
 import org.slf4j.MDC;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -17,11 +21,10 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
-import java.io.IOException;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.List;
-import java.util.Objects;
+import com.evo.common.webapp.support.CachedHttpServletRequestWrapper;
+import com.evo.common.webapp.support.SecurityUtils;
+
+import lombok.extern.slf4j.Slf4j;
 
 @WebFilter("/api/**")
 @Slf4j
@@ -32,30 +35,29 @@ public class ActionLogFilter extends OncePerRequestFilter {
     private static final String LOG_USERNAME = "username";
     private static final String LOG_CLIENT_MESSAGE_ID = "client_message_id";
 
-    private final List<String> blackList =
-            List.of(
-                    "\\/api\\/certificate\\/.well-known\\/jwks\\.json",
-                    ".*\\/actuator\\/.*",
-                    "\\/api\\/*-logs.*",
-                    "/swagger-ui.*",
-                    "/swagger-resources.*",
-                    "/v2/api-docs.*",
-                    ".*\\/integrations\\/files\\/upload");
+    private final List<String> blackList = List.of(
+            "\\/api\\/certificate\\/.well-known\\/jwks\\.json",
+            ".*\\/actuator\\/.*",
+            "\\/api\\/*-logs.*",
+            "/swagger-ui.*",
+            "/swagger-resources.*",
+            "/v2/api-docs.*",
+            ".*\\/integrations\\/files\\/upload");
     private final List<String> blackListMimeType =
             List.of("multipart\\/form-data.*", "image\\/.*", "application\\/octet-stream.*");
 
     @Override
-    protected void doFilterInternal(HttpServletRequest servletRequest, HttpServletResponse servletResponse, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(
+            HttpServletRequest servletRequest, HttpServletResponse servletResponse, FilterChain filterChain)
+            throws ServletException, IOException {
         Instant start = Instant.now();
         HttpServletRequest httpServletRequest = servletRequest;
-        ContentCachingResponseWrapper cachedResponse =
-                new ContentCachingResponseWrapper(servletResponse);
+        ContentCachingResponseWrapper cachedResponse = new ContentCachingResponseWrapper(servletResponse);
         cachedResponse.setCharacterEncoding("UTF-8");
 
         String requestContentType = httpServletRequest.getHeader("Content-Type");
-        boolean ignoredRequestBody =
-                Objects.nonNull(requestContentType)
-                        && this.blackListMimeType.stream().anyMatch(requestContentType::matches);
+        boolean ignoredRequestBody = Objects.nonNull(requestContentType)
+                && this.blackListMimeType.stream().anyMatch(requestContentType::matches);
 
         if (!ignoredRequestBody) {
             httpServletRequest = new CachedHttpServletRequestWrapper(servletRequest);
@@ -69,9 +71,7 @@ public class ActionLogFilter extends OncePerRequestFilter {
         }
         try {
             MDC.put(LOG_REMOTE_IP, remoteIp);
-            MDC.put(
-                    LOG_USERNAME,
-                    SecurityUtils.getCurrentUser().orElse("anonymous"));
+            MDC.put(LOG_USERNAME, SecurityUtils.getCurrentUser().orElse("anonymous"));
             MDC.put(LOG_CLIENT_MESSAGE_ID, clientMessageId);
             filterChain.doFilter(httpServletRequest, cachedResponse);
         } finally {
@@ -81,20 +81,16 @@ public class ActionLogFilter extends OncePerRequestFilter {
             cachedResponse.copyBodyToResponse();
             // check response content type
             String responseContentType = cachedResponse.getHeader("Content-Type");
-            boolean ignoredResponse =
-                    Objects.nonNull(responseContentType)
-                            && this.blackListMimeType.stream()
-                            .anyMatch(responseContentType::matches);
+            boolean ignoredResponse = Objects.nonNull(responseContentType)
+                    && this.blackListMimeType.stream().anyMatch(responseContentType::matches);
             if (!ignoredResponse) {
                 responseStr
                         .append("Response: ")
                         .append(new String(responseArray, cachedResponse.getCharacterEncoding()));
             }
             log.info("ActionLogFilter response: " + responseStr.toString());
-            if (shouldFilter(servletRequest)
-                    && cachedResponse.getStatus() >= START_LOG_HTTP_STATUS) {
+            if (shouldFilter(servletRequest) && cachedResponse.getStatus() >= START_LOG_HTTP_STATUS) {
                 long time = Duration.between(start, finishRequest).toMillis();
-
             }
         }
         MDC.remove(LOG_REMOTE_IP);

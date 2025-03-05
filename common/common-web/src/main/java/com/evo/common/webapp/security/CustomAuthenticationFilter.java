@@ -1,14 +1,15 @@
 package com.evo.common.webapp.security;
 
-import com.evo.common.UserAuthentication;
-import com.evo.common.UserAuthority;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -22,10 +23,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import com.evo.common.UserAuthentication;
+import com.evo.common.UserAuthority;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
@@ -34,13 +36,14 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
     private final AuthorityService authorityService;
 
     @Override
-    protected void doFilterInternal(@NonNull HttpServletRequest request,
-                                    @NonNull HttpServletResponse response,
-                                    @NonNull FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(
+            @NonNull HttpServletRequest request,
+            @NonNull HttpServletResponse response,
+            @NonNull FilterChain filterChain)
+            throws ServletException, IOException {
         log.info("CustomAuthenticationFilter");
         SecurityContext securityContext = SecurityContextHolder.getContext();
-        JwtAuthenticationToken authentication =
-                (JwtAuthenticationToken) securityContext.getAuthentication();
+        JwtAuthenticationToken authentication = (JwtAuthenticationToken) securityContext.getAuthentication();
         Jwt token = authentication.getToken();
 
         Boolean isRoot = Boolean.FALSE;
@@ -72,13 +75,17 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
         User principal = new User(username, "", grantedPermissions);
         AbstractAuthenticationToken auth =
                 new UserAuthentication(principal, token, grantedPermissions, isRoot, isClient);
-
         SecurityContextHolder.getContext().setAuthentication(auth);
         filterChain.doFilter(request, response);
     }
 
     @Override
-    protected boolean shouldNotFilter(@NonNull HttpServletRequest request) {  // Quyết định xem bộ lọc có nên được áp dụng cho yêu cầu hay không. Trong trường hợp này, nó chỉ áp dụng bộ lọc khi yêu cầu có chứa một JwtAuthenticationToken, tức là yêu cầu có chứa JWT hợp lệ.
+    protected boolean shouldNotFilter(
+            @NonNull
+                    HttpServletRequest
+                            request) { // Quyết định xem bộ lọc có nên được áp dụng cho yêu cầu hay không. Trong trường
+        // hợp này, nó chỉ áp dụng bộ lọc khi yêu cầu có chứa một JwtAuthenticationToken,
+        // tức là yêu cầu có chứa JWT hợp lệ.
         SecurityContext securityContext = SecurityContextHolder.getContext();
         Authentication authentication = securityContext.getAuthentication();
 
@@ -86,7 +93,8 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private Optional<UserAuthority> enrichAuthority(Jwt token) { // Lấy thông tin về quyền của user từ token
-        if (StringUtils.hasText(token.getClaimAsString("userId")) && token.getClaimAsString("userId").equals("common")) {
+        if (StringUtils.hasText(token.getClaimAsString("userId"))
+                && token.getClaimAsString("userId").equals("common")) {
             return Optional.ofNullable(authorityService.getClientAuthority(token.getClaimAsString("sub")));
         }
         String username;

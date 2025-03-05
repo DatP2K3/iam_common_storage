@@ -1,5 +1,12 @@
 package com.evo.common.storage.client;
 
+import java.util.List;
+import java.util.UUID;
+
+import org.springframework.cloud.openfeign.FallbackFactory;
+import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.evo.common.dto.request.SearchFileRequest;
 import com.evo.common.dto.request.UpdateFileRequest;
 import com.evo.common.dto.response.ApiResponses;
@@ -8,16 +15,13 @@ import com.evo.common.dto.response.PageApiResponse;
 import com.evo.common.enums.ServiceUnavailableError;
 import com.evo.common.exception.ForwardInnerAlertException;
 import com.evo.common.exception.ResponseException;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.openfeign.FallbackFactory;
-import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
-public class StorageClientFallback implements FallbackFactory<StorageClient> { // FallbackFactory: Dùng để xử lý khi gặp lỗi khi gọi api từ Iam Client
+public class StorageClientFallback
+        implements FallbackFactory<
+                StorageClient> { // FallbackFactory: Dùng để xử lý khi gặp lỗi khi gọi api từ Iam Client
     @Override
     public StorageClient create(Throwable cause) {
         return new FallbackWithFactory(cause);
@@ -32,7 +36,8 @@ public class StorageClientFallback implements FallbackFactory<StorageClient> { /
         }
 
         @Override
-        public ApiResponses<List<FileResponse>> uploadFiles(List<MultipartFile> files, boolean isPublic, String description) {
+        public ApiResponses<List<FileResponse>> uploadFiles(
+                List<MultipartFile> files, boolean isPublic, String description) {
             if (cause instanceof ForwardInnerAlertException) {
                 throw (RuntimeException) cause;
             }

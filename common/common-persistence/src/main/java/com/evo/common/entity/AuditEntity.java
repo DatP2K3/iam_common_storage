@@ -1,14 +1,16 @@
-package com.evo.common;
+package com.evo.common.entity;
+
+import java.time.Instant;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
-import lombok.Getter;
-import lombok.Setter;
+
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 
-import java.time.Instant;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter

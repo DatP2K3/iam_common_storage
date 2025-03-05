@@ -2,6 +2,7 @@ package com.evo.common.dto.error;
 
 import com.evo.common.dto.response.ApiResponses;
 import com.fasterxml.jackson.annotation.JsonInclude;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;

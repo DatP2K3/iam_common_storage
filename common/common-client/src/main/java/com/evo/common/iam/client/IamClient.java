@@ -1,14 +1,15 @@
 package com.evo.common.iam.client;
 
-import com.evo.common.UserAuthority;
-import com.evo.common.dto.response.ApiResponses;
-import com.evo.common.iam.config.FeignClientConfiguration;
+import java.util.UUID;
+
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import java.util.UUID;
+import com.evo.common.UserAuthority;
+import com.evo.common.dto.response.ApiResponses;
+import com.evo.common.iam.config.FeignClientConfiguration;
 
 @FeignClient(
         url = "${app.iam.internal-url:}",

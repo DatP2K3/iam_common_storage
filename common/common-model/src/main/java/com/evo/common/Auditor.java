@@ -1,10 +1,9 @@
 package com.evo.common;
 
+import java.time.Instant;
+
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-
-import java.time.Instant;
-import java.time.LocalDateTime;
 
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor

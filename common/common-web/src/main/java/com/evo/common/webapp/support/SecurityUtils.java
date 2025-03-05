@@ -1,16 +1,15 @@
 package com.evo.common.webapp.support;
 
+import java.util.Optional;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Optional;
-
 public final class SecurityUtils {
 
-    private SecurityUtils() {
-    }
+    private SecurityUtils() {}
 
     public static Optional<String> getCurrentUser() {
         SecurityContext securityContext = SecurityContextHolder.getContext();
@@ -27,5 +26,4 @@ public final class SecurityUtils {
         }
         return null;
     }
-
 }

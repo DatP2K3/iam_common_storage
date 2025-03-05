@@ -1,13 +1,14 @@
 package com.evo.common.dto.response;
 
+import java.io.Serializable;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-
-import java.io.Serializable;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @SuperBuilder
