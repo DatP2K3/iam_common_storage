@@ -1,17 +1,18 @@
 package com.evo.common.webapp.security.impl;
 
+import java.util.UUID;
+
+import org.springframework.stereotype.Service;
+
 import com.evo.common.UserAuthority;
 import com.evo.common.iam.client.IamClient;
 import com.evo.common.iam.client.IamNoTokenClient;
 import com.evo.common.webapp.security.AuthorityService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
-import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-
 public class RemoteAuthorityServiceImpl implements AuthorityService {
     private final IamClient iamClient;
     private final IamNoTokenClient iamNoTokenClient;

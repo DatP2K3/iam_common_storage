@@ -1,10 +1,11 @@
 package com.evo.common.exception;
 
+import java.io.Serial;
+
 import com.evo.common.dto.error.ErrorResponse;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
-import java.io.Serial;
 
 @EqualsAndHashCode(callSuper = true)
 @Data

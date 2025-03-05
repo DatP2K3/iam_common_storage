@@ -1,18 +1,21 @@
 package com.evo.common.iam.client;
 
+import java.util.UUID;
+
+import org.springframework.cloud.openfeign.FallbackFactory;
+import org.springframework.stereotype.Component;
+
 import com.evo.common.UserAuthority;
 import com.evo.common.dto.response.ApiResponses;
 import com.evo.common.enums.ServiceUnavailableError;
 import com.evo.common.exception.ForwardInnerAlertException;
 import com.evo.common.exception.ResponseException;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.openfeign.FallbackFactory;
-import org.springframework.stereotype.Component;
 
-import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
-public class IamClientFallback implements FallbackFactory<IamClient> { // FallbackFactory: Dùng để xử lý khi gặp lỗi khi gọi api từ Iam Client
+public class IamClientFallback
+        implements FallbackFactory<IamClient> { // FallbackFactory: Dùng để xử lý khi gặp lỗi khi gọi api từ Iam Client
     @Override
     public IamClient create(Throwable cause) {
         return new FallbackWithFactory(cause);
@@ -31,8 +34,7 @@ public class IamClientFallback implements FallbackFactory<IamClient> { // Fallba
             if (cause instanceof ForwardInnerAlertException) {
                 return ApiResponses.fail((RuntimeException) cause);
             }
-            return ApiResponses.fail(
-                    new ResponseException(ServiceUnavailableError.IAM_SERVICE_UNAVAILABLE_ERROR));
+            return ApiResponses.fail(new ResponseException(ServiceUnavailableError.IAM_SERVICE_UNAVAILABLE_ERROR));
         }
 
         @Override
@@ -40,8 +42,7 @@ public class IamClientFallback implements FallbackFactory<IamClient> { // Fallba
             if (cause instanceof ForwardInnerAlertException) {
                 return ApiResponses.fail((RuntimeException) cause);
             }
-            return ApiResponses.fail(
-                    new ResponseException(ServiceUnavailableError.IAM_SERVICE_UNAVAILABLE_ERROR));
+            return ApiResponses.fail(new ResponseException(ServiceUnavailableError.IAM_SERVICE_UNAVAILABLE_ERROR));
         }
     }
 }
