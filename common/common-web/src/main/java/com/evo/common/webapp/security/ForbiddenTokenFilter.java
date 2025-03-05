@@ -25,7 +25,7 @@ public class ForbiddenTokenFilter extends OncePerRequestFilter { // Filter này 
     private final TokenCacheService tokenCacheService;
 
     @Override
-    protected void doFilterInternal(@NonNull HttpServletRequest httpServletRequest, @NonNull HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(@NonNull HttpServletRequest httpServletRequest, @NonNull HttpServletResponse httpServletResponse, @NonNull FilterChain filterChain) throws ServletException, IOException {
         log.info("ForbiddenTokenFilter");
         SecurityContext securityContext = SecurityContextHolder.getContext();
         JwtAuthenticationToken authentication =

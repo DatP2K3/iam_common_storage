@@ -29,5 +29,9 @@ public class PageApiResponse<T> extends ApiResponses<T> {
     public static class PageableResponse {
         private int pageIndex;
         private int pageSize;
+        private int totalPages;
+        private long totalElements;
+        private boolean hasNext;
+        private boolean hasPrevious;
     }
 }

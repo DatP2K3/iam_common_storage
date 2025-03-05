@@ -19,16 +19,11 @@ public class RegexPermissionEvaluator implements PermissionEvaluator {
             throw new RuntimeException("NOT_SUPPORTED_AUTHENTICATION");
         }
 
-        System.out.println(userAuthentication.getGrantedPermissions());
-        System.out.println(requiredPermission);
-
         if (userAuthentication.isRoot()) {
-            System.out.println("Root user, granting all permissions.");
             return true;
         }
 
         if (userAuthentication.isClient()) {
-            System.out.println("Client user, granting all permissions.");
             return true;
         }
 

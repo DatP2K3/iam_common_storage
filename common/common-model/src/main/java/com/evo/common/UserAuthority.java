@@ -13,7 +13,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 public class UserAuthority {
-    private int userId;
+    private UUID userId;
     private Boolean isRoot;
     private Boolean isClient;
     private List<String> grantedPermissions;

@@ -1,8 +1,8 @@
 package com.evo.common.webapp.security.impl;
 
 import com.evo.common.UserAuthority;
-import com.evo.common.client.iam.IamClient;
-import com.evo.common.client.iam.IamNoTokenClient;
+import com.evo.common.iam.client.IamClient;
+import com.evo.common.iam.client.IamNoTokenClient;
 import com.evo.common.webapp.security.AuthorityService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,7 +17,7 @@ public class RemoteAuthorityServiceImpl implements AuthorityService {
     private final IamNoTokenClient iamNoTokenClient;
 
     @Override
-    public UserAuthority getUserAuthority(int userId) {
+    public UserAuthority getUserAuthority(UUID userId) {
         return null;
     }
 

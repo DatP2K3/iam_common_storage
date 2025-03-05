@@ -33,9 +33,6 @@ import java.util.Set;
 public class CustomAuthenticationFilter extends OncePerRequestFilter {
     private final AuthorityService authorityService;
 
-    @Value("${oauth.client.iam.client-id}")
-    private String clientId;
-
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
                                     @NonNull HttpServletResponse response,
@@ -88,7 +85,7 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
         return !(authentication instanceof JwtAuthenticationToken);
     }
 
-    private Optional<UserAuthority> enrichAuthority(Jwt token) { // Lấy thông tin về quyền của user từ tokenif (StringUtils.hasText(token.getClaimAsString("clientHost"))) {
+    private Optional<UserAuthority> enrichAuthority(Jwt token) { // Lấy thông tin về quyền của user từ token
         if (StringUtils.hasText(token.getClaimAsString("userId")) && token.getClaimAsString("userId").equals("common")) {
             return Optional.ofNullable(authorityService.getClientAuthority(token.getClaimAsString("sub")));
         }

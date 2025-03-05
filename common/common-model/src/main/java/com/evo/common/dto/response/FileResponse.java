@@ -6,13 +6,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class FileResponse {
-    private int id;
+    private UUID id;
     private String originName;
     private String md5Name;
     private String fileType;
