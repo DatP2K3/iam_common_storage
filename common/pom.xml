@@ -19,7 +19,6 @@
 		<module>common-web</module>
 		<module>common-client</module>
 		<module>common-model</module>
-		<module>common-persistence</module>
 	</modules>
 
 	<properties>
@@ -56,10 +55,6 @@
 	</dependencies>
 	<build>
 		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
 			<plugin>
 				<groupId>com.diffplug.spotless</groupId>
 				<artifactId>spotless-maven-plugin</artifactId>
