@@ -1,18 +1,19 @@
 package com.evotek.storage.domain;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.UUID;
+
+import com.evo.common.Auditor;
 import com.evotek.storage.domain.command.StoreFileCmd;
 import com.evotek.storage.domain.command.UpdateFileCmd;
 import com.evotek.storage.infrastructure.support.IdUtils;
 import com.evotek.storage.infrastructure.support.exception.AppErrorCode;
 import com.evotek.storage.infrastructure.support.exception.AppException;
+
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.time.LocalDateTime;
-import java.util.UUID;
 
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
@@ -20,7 +21,7 @@ import java.util.UUID;
 @SuperBuilder
 @Setter
 @Getter
-public class File {
+public class File extends Auditor {
     private UUID id;
     private String originName;
     private String md5Name;
@@ -32,12 +33,9 @@ public class File {
     private String url;
     private Boolean isPublic;
     private Boolean deleted = false;
-    private String createdBy;
-    private String lastModifiedBy;
-    private LocalDateTime createdAt;
     private FileHistory history;
 
-    public File (StoreFileCmd cmd) {
+    public File(StoreFileCmd cmd) {
         validateFileName(cmd.getOriginName());
         this.id = IdUtils.nextId();
         this.originName = cmd.getOriginName();
@@ -48,7 +46,7 @@ public class File {
         this.fileSize = cmd.getFileSize();
         this.description = cmd.getDescription();
         this.isPublic = cmd.getIsPublic();
-        if (isPublic) {
+        if (Boolean.TRUE.equals(isPublic)) {
             this.url = "http://localhost:8080/api/public/file/" + this.id;
         } else {
             this.url = "http://localhost:8080/api/file/" + this.id;
@@ -61,14 +59,14 @@ public class File {
         this.md5Name = hashFileName(this.originName);
         this.description = cmd.getDescription();
         if (originName == null || originName.contains("..")) {
-            throw new RuntimeException("Invalid file name: " + originName);
+            throw new AppException(AppErrorCode.INVALID_FILENAME);
         }
     }
 
     private String hashFileName(String fileName) {
         try {
             String fileExtension = originName.substring(originName.lastIndexOf("."));
-            MessageDigest messageDigest = MessageDigest.getInstance("MD5");
+            MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
             byte[] hashBytes = messageDigest.digest(fileName.getBytes(StandardCharsets.UTF_8));
             StringBuilder stringBuilder = new StringBuilder();
             for (byte b : hashBytes) {
@@ -81,7 +79,7 @@ public class File {
     }
 
     private void validateFileName(String fileName) {
-        if(fileName == null || fileName.contains("..")) {
+        if (fileName == null || fileName.contains("..")) {
             throw new AppException(AppErrorCode.INVALID_FILENAME);
         }
     }

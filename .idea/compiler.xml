@@ -17,11 +17,12 @@
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
         </processorPath>
         <module name="common-model" />
         <module name="common-web" />
       </profile>
-      <profile name="Annotation profile for iam" enabled="true">
+      <profile name="Annotation profile for notification" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -31,10 +32,12 @@
           <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct/1.6.3/mapstruct-1.6.3.jar" />
         </processorPath>
         <module name="iam" />
+        <module name="notification" />
         <module name="storage" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="common-persistence" target="21" />
       <module name="spring-boot-starter-parent" target="1.5" />
     </bytecodeTargetLevel>
   </component>
@@ -42,10 +45,12 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="common-client" options="-parameters" />
       <module name="common-model" options="-parameters" />
+      <module name="common-persistence" options="-parameters" />
       <module name="common-web" options="-parameters" />
       <module name="config" options="-parameters" />
       <module name="gateway" options="-parameters" />
       <module name="iam" options="-parameters" />
+      <module name="notification" options="-parameters" />
       <module name="storage" options="-parameters" />
     </option>
   </component>

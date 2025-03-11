@@ -1,0 +1,50 @@
+17:06:23.509 INFO  o.h.v.i.u.Version - HV000001: Hibernate Validator 8.0.2.Final
+17:06:23.531 INFO  c.e.s.StorageApplicationTests - Starting StorageApplicationTests using Java 23.0.2 with PID 62193 (started by macbookairm3 in /Users/macbookairm3/Documents/DDD Project/storage)
+17:06:23.532 INFO  c.e.s.StorageApplicationTests - No active profile set, falling back to 1 default profile: "default"
+17:06:24.101 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+17:06:24.102 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+17:06:24.174 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 64 ms. Found 2 JPA repository interfaces.
+17:06:24.184 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+17:06:24.185 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+17:06:24.198 INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.evotek.storage.infrastructure.persistence.repository.FileEntityRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+17:06:24.198 INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.evotek.storage.infrastructure.persistence.repository.FileHistoryEntityRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+17:06:24.198 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 7 ms. Found 0 Redis repository interfaces.
+17:06:24.354 INFO  o.s.c.c.s.GenericScope - BeanFactory id=397b668a-d463-327a-90c3-6a08c8ba1140
+17:06:24.670 INFO  o.h.Version - HHH000412: Hibernate ORM core version 6.5.3.Final
+17:06:24.683 INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+17:06:24.798 INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+17:06:24.812 INFO  c.z.h.HikariDataSource - HikariPool-1 - Starting...
+17:06:24.910 INFO  c.z.h.p.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@7668f8fd
+17:06:24.911 INFO  c.z.h.HikariDataSource - HikariPool-1 - Start completed.
+17:06:25.318 INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+17:06:25.383 INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+17:06:26.524 INFO  o.s.b.a.e.w.EndpointLinksResolver - Exposing 1 endpoint beneath base path '/actuator'
+17:06:26.807 INFO  c.e.s.StorageApplicationTests - Started StorageApplicationTests in 3.505 seconds (process running for 4.229)
+17:06:27.300 INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+17:06:27.300 INFO  c.z.h.HikariDataSource - HikariPool-1 - Shutdown initiated...
+17:06:27.302 INFO  c.z.h.HikariDataSource - HikariPool-1 - Shutdown completed.
+17:14:27.364 INFO  o.h.v.i.u.Version - HV000001: Hibernate Validator 8.0.2.Final
+17:14:27.387 INFO  c.e.s.StorageApplicationTests - Starting StorageApplicationTests using Java 23.0.2 with PID 67559 (started by macbookairm3 in /Users/macbookairm3/Documents/DDD Project/storage)
+17:14:27.388 INFO  c.e.s.StorageApplicationTests - No active profile set, falling back to 1 default profile: "default"
+17:14:27.900 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+17:14:27.901 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+17:14:27.999 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 93 ms. Found 2 JPA repository interfaces.
+17:14:28.019 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+17:14:28.020 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+17:14:28.034 INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.evotek.storage.infrastructure.persistence.repository.FileEntityRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+17:14:28.034 INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.evotek.storage.infrastructure.persistence.repository.FileHistoryEntityRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+17:14:28.035 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 8 ms. Found 0 Redis repository interfaces.
+17:14:28.389 INFO  o.s.c.c.s.GenericScope - BeanFactory id=397b668a-d463-327a-90c3-6a08c8ba1140
+17:14:28.708 INFO  o.h.Version - HHH000412: Hibernate ORM core version 6.5.3.Final
+17:14:28.720 INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+17:14:28.822 INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+17:14:28.847 INFO  c.z.h.HikariDataSource - HikariPool-1 - Starting...
+17:14:28.936 INFO  c.z.h.p.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@576323ff
+17:14:28.937 INFO  c.z.h.HikariDataSource - HikariPool-1 - Start completed.
+17:14:29.356 INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+17:14:29.380 INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+17:14:30.599 INFO  o.s.b.a.e.w.EndpointLinksResolver - Exposing 1 endpoint beneath base path '/actuator'
+17:14:30.902 INFO  c.e.s.StorageApplicationTests - Started StorageApplicationTests in 3.824 seconds (process running for 4.492)
+17:14:31.377 INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+17:14:31.378 INFO  c.z.h.HikariDataSource - HikariPool-1 - Shutdown initiated...
+17:14:31.380 INFO  c.z.h.HikariDataSource - HikariPool-1 - Shutdown completed.

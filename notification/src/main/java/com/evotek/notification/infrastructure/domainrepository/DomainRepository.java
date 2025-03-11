@@ -1,4 +1,4 @@
-package com.evotek.storage.infrastructure.domainrepository;
+package com.evotek.notification.infrastructure.domainrepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -11,4 +11,6 @@ public interface DomainRepository<D, ID> {
     List<D> saveAll(List<D> entities);
 
     List<D> findAllByIds(List<ID> ids);
+
+    D getById(ID id);
 }

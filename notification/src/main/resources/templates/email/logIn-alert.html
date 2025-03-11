@@ -1,10 +1,61 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title>$Title$</title>
+  <title>Login Alert</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .header {
+      background-color: #4A89DC;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    .content {
+      padding: 20px;
+    }
+    .alert-box {
+      background-color: #f8f9fa;
+      border-left: 4px solid #4A89DC;
+      padding: 15px;
+      margin: 20px 0;
+    }
+    .footer {
+      background-color: #f5f5f5;
+      padding: 10px;
+      font-size: 12px;
+      text-align: center;
+      color: #666;
+    }
+  </style>
 </head>
 <body>
-$END$
+<div class="header">
+  <h1>Security Alert</h1>
+</div>
+
+<div class="content">
+  <p>Dear <strong th:text="${username}">User</strong>,</p>
+  <p>We have detected a new login to your account with the following details:</p>
+
+  <div class="alert-box">
+    <p><strong>Time:</strong> <span th:text="${time}">time</span></p>
+    <p><strong>username:</strong> <span th:text="${username}">DatP2K3</span></p>
+    <p th:if="${ipAddress != null}"><strong>IP Address:</strong> <span th:text="${ipAddress}">ip</span></p>
+    <p th:if="${device != null}"><strong>Device:</strong> <span th:text="${device}">device</span></p>
+    <p th:if="${location != null}"><strong>Location:</strong> <span th:text="${location}">location</span></p>
+  </div>
+</div>
+
+<div class="footer">
+  <p>This is an automated message. Please do not reply to this email.</p>
+  <p>&copy; <span th:text="${#dates.format(#dates.createNow(), 'yyyy')}">year</span> Your Company. All rights reserved.</p>
+</div>
 </body>
 </html>

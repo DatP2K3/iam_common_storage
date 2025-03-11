@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @EnableFeignClients(basePackages = {"com.evo.common.iam.client", "com.evo.common.storage.client"})
 @SpringBootApplication(scanBasePackages = {"com.evotek.storage", "com.evo.common"})
 public class StorageApplication {
-	public static void main(String[] args) {
-		SpringApplication.run(StorageApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(StorageApplication.class, args);
+    }
 }

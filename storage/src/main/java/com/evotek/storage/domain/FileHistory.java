@@ -1,10 +1,12 @@
 package com.evotek.storage.domain;
 
+import java.util.UUID;
+
+import com.evo.common.Auditor;
 import com.evotek.storage.domain.command.WriteHistoryCmd;
+
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-
-import java.util.UUID;
 
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
@@ -12,7 +14,7 @@ import java.util.UUID;
 @SuperBuilder
 @Setter
 @Getter
-public class FileHistory {
+public class FileHistory extends Auditor {
     private UUID fileId;
     private String action;
 

@@ -1,4 +1,4 @@
-package com.evotek.storage.infrastructure.persistence.mapper;
+package com.evotek.notification.infrastructure.persistence.mapper;
 
 import java.util.List;
 

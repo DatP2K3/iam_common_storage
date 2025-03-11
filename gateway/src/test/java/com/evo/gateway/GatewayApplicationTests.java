@@ -7,8 +7,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 @EnableConfigServer
 class GatewayApplicationTests {
 
-	@Test
-	void contextLoads() {
-	}
-
+    @Test
+    void contextLoads() {}
 }

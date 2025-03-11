@@ -1,17 +1,17 @@
 package com.evotek.storage.infrastructure.persistence.entity;
 
+import java.util.UUID;
+
 import jakarta.persistence.*;
+
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import com.evo.common.entity.AuditEntity;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Entity
 @Data
@@ -20,7 +20,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "files")
-public class FileEntity {
+public class FileEntity extends AuditEntity {
     @Id
     @Column(name = "id")
     private UUID id;
@@ -32,7 +32,7 @@ public class FileEntity {
     private String md5Name;
 
     @Column(name = "file_type", nullable = false)
-    private String fileType; //để hõ trợ vết api preview
+    private String fileType; // để hõ trợ vết api preview
 
     @Column(name = "file_height")
     private Integer fileHeight;
@@ -54,16 +54,4 @@ public class FileEntity {
 
     @Column(name = "deleted", nullable = false)
     private Boolean deleted = false;
-
-    @CreatedBy
-    @Column(name = "created_by", updatable = false)
-    private String createdBy;
-
-    @LastModifiedBy
-    @Column(name = "last_modified_by")
-    private String lastModifiedBy;
-
-    @CreatedDate
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
 }

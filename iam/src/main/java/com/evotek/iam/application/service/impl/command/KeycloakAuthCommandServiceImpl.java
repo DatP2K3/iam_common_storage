@@ -17,10 +17,10 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import com.evo.common.dto.event.NotificationEvent;
+import com.evo.common.dto.request.SendNotificationRequest;
 import com.evo.common.enums.Channel;
+import com.evo.common.enums.KafkaTopic;
 import com.evo.common.enums.TemplateCode;
-import com.evo.common.enums.Topic;
 import com.evo.common.support.SecurityContextUtils;
 import com.evotek.iam.application.configuration.TokenProvider;
 import com.evotek.iam.application.dto.request.LoginRequest;
@@ -57,7 +57,7 @@ public class KeycloakAuthCommandServiceImpl implements AuthServiceCommand {
     private final UserDomainRepository userDomainRepository;
     private final CommandMapper commandMapper;
     private final TokenProvider tokenProvider;
-    private final KafkaTemplate<String, NotificationEvent> kafkaTemplate;
+    private final KafkaTemplate<String, SendNotificationRequest> kafkaTemplate;
 
     @Value("${jwt.valid-duration}")
     private long validDuration;
@@ -78,13 +78,13 @@ public class KeycloakAuthCommandServiceImpl implements AuthServiceCommand {
 
             Map<String, Object> params = SecurityContextUtils.getSecurityContextMap();
             params.put("username", loginRequest.getUsername());
-            NotificationEvent mailAlert = NotificationEvent.builder()
+            SendNotificationRequest mailAlert = SendNotificationRequest.builder()
                     .channel(Channel.EMAIL.name())
                     .recipient(user.getEmail())
                     .templateCode(TemplateCode.LOGIN_ALERT)
                     .param(params)
                     .build();
-            kafkaTemplate.send(Topic.NOTIFICATION_GROUP.getTopicName(), mailAlert);
+            kafkaTemplate.send(KafkaTopic.SEND_NOTIFICATION_GROUP.getTopicName(), mailAlert);
             return tokenDTO;
         } catch (FeignException exception) {
             throw errorNormalizer.handleKeyCloakException(exception);
@@ -133,13 +133,13 @@ public class KeycloakAuthCommandServiceImpl implements AuthServiceCommand {
             Map<String, Object> params = SecurityContextUtils.getSecurityContextMap();
             params.put("resetUrl", resetUrl);
             params.put("username", username);
-            NotificationEvent mailAlert = NotificationEvent.builder()
+            SendNotificationRequest mailAlert = SendNotificationRequest.builder()
                     .channel(Channel.EMAIL.name())
                     .recipient(user.getEmail())
                     .templateCode(TemplateCode.REQUEST_CHANGE_PASSWORD)
                     .param(params)
                     .build();
-            kafkaTemplate.send("notification-group", mailAlert);
+            kafkaTemplate.send(KafkaTopic.SEND_NOTIFICATION_GROUP.getTopicName(), mailAlert);
         } catch (Exception ex) {
             throw new AuthException(AuthErrorCode.UNCATEGORIZED_EXCEPTION);
         }
@@ -164,13 +164,13 @@ public class KeycloakAuthCommandServiceImpl implements AuthServiceCommand {
             userDomainRepository.save(user);
 
             Map<String, Object> params = SecurityContextUtils.getSecurityContextMap();
-            NotificationEvent mailAlert = NotificationEvent.builder()
+            SendNotificationRequest mailAlert = SendNotificationRequest.builder()
                     .channel(Channel.EMAIL.name())
                     .recipient(user.getEmail())
                     .templateCode(TemplateCode.PASSWORD_CHANGE_ALERT)
                     .param(params)
                     .build();
-            kafkaTemplate.send("notification-group", mailAlert);
+            kafkaTemplate.send(KafkaTopic.SEND_NOTIFICATION_GROUP.getTopicName(), mailAlert);
         } catch (Exception ex) {
             throw new AuthException(AuthErrorCode.UNCATEGORIZED_EXCEPTION);
         }

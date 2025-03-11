@@ -1,10 +1,10 @@
 package com.evotek.storage.domain.command;
 
+import java.util.UUID;
+
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.UUID;
 
 @Getter
 @Setter

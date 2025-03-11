@@ -1,4 +1,4 @@
-package com.evotek.storage.infrastructure.domainrepository;
+package com.evotek.notification.infrastructure.domainrepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -7,7 +7,7 @@ import jakarta.transaction.Transactional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.evotek.storage.infrastructure.persistence.mapper.EntityMapper;
+import com.evotek.notification.infrastructure.persistence.mapper.EntityMapper;
 
 public abstract class AbstractDomainRepository<D, E, ID> implements DomainRepository<D, ID> {
     protected final JpaRepository<E, ID> repository;
@@ -44,5 +44,14 @@ public abstract class AbstractDomainRepository<D, E, ID> implements DomainReposi
         List<E> entities = this.entityMapper.toEntityList(domains);
         entities = this.repository.saveAll(entities);
         return this.entityMapper.toDomainModelList(entities);
+    }
+
+    protected D enrich(D d) {
+        List<D> ds = List.of(d);
+        return this.enrichList(ds).getFirst();
+    }
+
+    protected List<D> enrichList(List<D> ds) {
+        return ds;
     }
 }

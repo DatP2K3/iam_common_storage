@@ -1,4 +1,4 @@
-package com.evotek.notification.application.service;
+package com.evotek.notification.application.service.send;
 
 import java.util.Map;
 

@@ -60,7 +60,8 @@ public class HttpSecurityConfiguration {
         "/swagger-doc/**",
         "/api/test-retry",
         "api/test/refresh",
-        "/api/config/reload"
+        "/api/config/reload",
+        "/api/test/**"
     };
 
     public HttpSecurityConfiguration(

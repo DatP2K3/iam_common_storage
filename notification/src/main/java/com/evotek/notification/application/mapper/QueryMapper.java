@@ -1,4 +1,6 @@
 package com.evotek.notification.application.mapper;
 
-public interface Querymapper {
-}
+import org.mapstruct.Mapper;
+
+@Mapper(componentModel = "spring")
+public interface QueryMapper {}
