@@ -1,22 +1,22 @@
 package com.evotek.iam.infrastructure.adapter.keycloak;
 
-import java.util.Map;
-
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.evotek.iam.application.dto.request.UpdateUserRequest;
-import com.evotek.iam.application.dto.request.identityKeycloak.*;
+import com.evotek.iam.application.dto.request.*;
 import com.evotek.iam.application.dto.response.TokenDTO;
-import com.evotek.iam.domain.command.LockUserCmd;
 import com.evotek.iam.domain.command.ResetKeycloakPasswordCmd;
 import com.evotek.iam.infrastructure.adapter.keycloak.config.KeycloakIdentityClientConfiguration;
 
 import feign.QueryMap;
 
-@FeignClient(name = "identity-client", url = "${idp.url}", configuration = KeycloakIdentityClientConfiguration.class)
+@FeignClient(
+        name = "identity-client",
+        url = "${idp.url}",
+        contextId = "identity-client",
+        configuration = KeycloakIdentityClientConfiguration.class)
 public interface KeycloakIdentityClient {
     @PostMapping(
             value = "/realms/IamService/protocol/openid-connect/token",
@@ -24,7 +24,7 @@ public interface KeycloakIdentityClient {
     TokenDTO getToken(@QueryMap GetTokenRequest param);
 
     @PostMapping(value = "/admin/realms/IamService/users", consumes = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<?> createUser(
+    ResponseEntity<Object> createUser(
             @RequestHeader("authorization") String token, @RequestBody CreateUserKeycloakRequest param);
 
     @PostMapping(
@@ -47,7 +47,7 @@ public interface KeycloakIdentityClient {
     void lockUser(
             @RequestHeader("authorization") String token,
             @PathVariable("user_id") String userId,
-            @RequestBody LockUserCmd lockUserCmd);
+            @RequestBody LockUserRequest lockUserRequest);
 
     @PutMapping(
             value = "/admin/realms/IamService/users/{user_id}/reset-password",
@@ -56,7 +56,4 @@ public interface KeycloakIdentityClient {
             @RequestHeader("authorization") String token,
             @PathVariable("user_id") String userId,
             @RequestBody ResetKeycloakPasswordCmd resetKeycloakPasswordCmd);
-
-    @GetMapping(value = "/realms/IamService/protocol/openid-connect/userinfo")
-    ResponseEntity<Map<String, String>> getUserInfo(@RequestHeader("authorization") String token);
 }

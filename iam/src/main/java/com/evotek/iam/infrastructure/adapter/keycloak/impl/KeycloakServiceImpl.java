@@ -8,16 +8,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.evotek.iam.application.dto.request.CreateUserRequest;
-import com.evotek.iam.application.dto.request.identityKeycloak.CreateUserKeycloakRequest;
-import com.evotek.iam.application.dto.request.identityKeycloak.CredentialRequest;
-import com.evotek.iam.application.dto.request.identityKeycloak.LogoutRequest;
-import com.evotek.iam.application.dto.request.identityKeycloak.RefreshTokenRequest;
+import com.evotek.iam.application.dto.request.*;
 import com.evotek.iam.application.dto.response.TokenDTO;
 import com.evotek.iam.domain.command.ResetKeycloakPasswordCmd;
-import com.evotek.iam.infrastructure.adapter.keycloak.KeycloakCommandClient;
 import com.evotek.iam.infrastructure.adapter.keycloak.KeycloakIdentityClient;
-import com.evotek.iam.infrastructure.adapter.keycloak.KeycloakQueryClient;
+import com.evotek.iam.infrastructure.adapter.keycloak.KeycloakService;
 import com.evotek.iam.infrastructure.support.exception.ErrorNormalizer;
 
 import feign.FeignException;
@@ -25,9 +20,8 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class KeycloakCommandClientImpl implements KeycloakCommandClient {
+public class KeycloakServiceImpl implements KeycloakService {
     private final KeycloakIdentityClient keycloakIdentityClient;
-    private final KeycloakQueryClient keycloakQueryClient;
     private final ErrorNormalizer errorNormalizer;
 
     @Value("${idp.client-id}")
@@ -39,7 +33,7 @@ public class KeycloakCommandClientImpl implements KeycloakCommandClient {
     @Override
     public String createKeycloakUser(CreateUserRequest request) {
         try {
-            String token = keycloakQueryClient.getClientToken();
+            String token = getClientToken();
             var creationResponse = keycloakIdentityClient.createUser(
                     "Bearer " + token,
                     CreateUserKeycloakRequest.builder()
@@ -63,7 +57,8 @@ public class KeycloakCommandClientImpl implements KeycloakCommandClient {
     }
 
     @Override
-    public void resetPassword(String token, UUID keycloakUserId, ResetKeycloakPasswordCmd resetKeycloakPasswordCmd) {
+    public void resetPassword(UUID keycloakUserId, ResetKeycloakPasswordCmd resetKeycloakPasswordCmd) {
+        String token = getClientToken();
         try {
             keycloakIdentityClient.resetPassword(
                     "Bearer " + token, keycloakUserId.toString(), resetKeycloakPasswordCmd);
@@ -86,9 +81,9 @@ public class KeycloakCommandClientImpl implements KeycloakCommandClient {
             keycloakIdentityClient.logout(
                     authorizationHeader,
                     LogoutRequest.builder()
-                            .client_id(clientId)
-                            .client_secret(clientSecret)
-                            .refresh_token(refreshToken)
+                            .clientId(clientId)
+                            .clientSecret(clientSecret)
+                            .refreshToken(refreshToken)
                             .build());
         } catch (FeignException e) {
             throw errorNormalizer.handleKeyCloakException(e);
@@ -99,12 +94,55 @@ public class KeycloakCommandClientImpl implements KeycloakCommandClient {
     public TokenDTO refreshToken(String refreshToken) {
         try {
             RefreshTokenRequest refreshTokenRequest = RefreshTokenRequest.builder()
-                    .client_id(clientId)
-                    .client_secret(clientSecret)
-                    .grant_type("refresh_token")
-                    .refresh_token(refreshToken)
+                    .clientId(clientId)
+                    .clientSecret(clientSecret)
+                    .grantType("refresh_token")
+                    .refreshToken(refreshToken)
                     .build();
             return keycloakIdentityClient.refreshToken(refreshTokenRequest);
+        } catch (FeignException e) {
+            throw errorNormalizer.handleKeyCloakException(e);
+        }
+    }
+
+    @Override
+    public String getClientToken() {
+        try {
+            TokenDTO tokenDTO = keycloakIdentityClient.getToken(GetTokenRequest.builder()
+                    .grantType("client_credentials")
+                    .clientId(clientId)
+                    .clientSecret(clientSecret)
+                    .scope("openid")
+                    .build());
+            return tokenDTO.getAccessToken();
+        } catch (FeignException e) {
+            throw errorNormalizer.handleKeyCloakException(e);
+        }
+    }
+
+    @Override
+    public TokenDTO authenticate(LoginRequest request) {
+        try {
+            return keycloakIdentityClient.getToken(GetTokenRequest.builder()
+                    .grantType("password")
+                    .clientId(clientId)
+                    .clientSecret(clientSecret)
+                    .scope("openid")
+                    .username(request.getUsername())
+                    .password(request.getPassword())
+                    .build());
+        } catch (FeignException e) {
+            throw errorNormalizer.handleKeyCloakException(e);
+        }
+    }
+
+    @Override
+    public void lockUser(UUID userId, boolean enabled) {
+        String token = getClientToken();
+        LockUserRequest lockUserRequest =
+                LockUserRequest.builder().enabled(enabled).build();
+        try {
+            keycloakIdentityClient.lockUser("Bearer " + token, userId.toString(), lockUserRequest);
         } catch (FeignException e) {
             throw errorNormalizer.handleKeyCloakException(e);
         }

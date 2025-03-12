@@ -1,4 +1,4 @@
-package com.evotek.iam.application.dto.request.identityKeycloak;
+package com.evotek.iam.application.dto.request;
 
 import lombok.*;
 

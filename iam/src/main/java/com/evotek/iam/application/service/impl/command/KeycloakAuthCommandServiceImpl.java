@@ -32,8 +32,7 @@ import com.evotek.iam.domain.UserActivityLog;
 import com.evotek.iam.domain.command.ResetKeycloakPasswordCmd;
 import com.evotek.iam.domain.command.WriteLogCmd;
 import com.evotek.iam.domain.repository.UserDomainRepository;
-import com.evotek.iam.infrastructure.adapter.keycloak.KeycloakCommandClient;
-import com.evotek.iam.infrastructure.adapter.keycloak.KeycloakQueryClient;
+import com.evotek.iam.infrastructure.adapter.keycloak.KeycloakService;
 import com.evotek.iam.infrastructure.support.exception.AuthErrorCode;
 import com.evotek.iam.infrastructure.support.exception.AuthException;
 import com.evotek.iam.infrastructure.support.exception.ErrorNormalizer;
@@ -49,8 +48,7 @@ import lombok.RequiredArgsConstructor;
 @Component("keycloakAuthCommandService")
 @RequiredArgsConstructor
 public class KeycloakAuthCommandServiceImpl implements AuthServiceCommand {
-    private final KeycloakQueryClient keycloakQueryClient;
-    private final KeycloakCommandClient keycloakCommandClient;
+    private final KeycloakService keycloakService;
     private final ErrorNormalizer errorNormalizer;
     private final PasswordEncoder passwordEncoder;
     private final RedisTemplate<Object, Object> redisTemplate;
@@ -68,7 +66,7 @@ public class KeycloakAuthCommandServiceImpl implements AuthServiceCommand {
     @Override
     public TokenDTO authenticate(LoginRequest loginRequest) {
         try {
-            TokenDTO tokenDTO = keycloakQueryClient.authenticate(loginRequest);
+            TokenDTO tokenDTO = keycloakService.authenticate(loginRequest);
 
             User user = userDomainRepository.getByUsername(loginRequest.getUsername());
             WriteLogCmd logCmd = commandMapper.from("Login");
@@ -103,7 +101,7 @@ public class KeycloakAuthCommandServiceImpl implements AuthServiceCommand {
             String accessJit = signedJWT.getJWTClaimsSet().getJWTID();
             Date expiryTime = signedJWT.getJWTClaimsSet().getExpirationTime();
             redisTemplate.opsForValue().set(accessJit, expiryTime, 3600, TimeUnit.MILLISECONDS);
-            keycloakCommandClient.logout(authorizationHeader, refreshToken);
+            keycloakService.logout(authorizationHeader, refreshToken);
 
             String username = signedJWT.getJWTClaimsSet().getStringClaim("preferred_username");
             User user = userDomainRepository.getByUsername(username);
@@ -121,7 +119,7 @@ public class KeycloakAuthCommandServiceImpl implements AuthServiceCommand {
 
     @Override
     public TokenDTO refresh(String refreshToken) {
-        return keycloakCommandClient.refreshToken(refreshToken);
+        return keycloakService.refreshToken(refreshToken);
     }
 
     @Override
@@ -153,10 +151,7 @@ public class KeycloakAuthCommandServiceImpl implements AuthServiceCommand {
             User user = userDomainRepository.getByUsername(username);
             user.changePassword(passwordEncoder.encode(resetKeycloakPasswordCmd.getValue()));
 
-            var keycloakToken = keycloakQueryClient.getClientToken();
-
-            keycloakCommandClient.resetPassword(
-                    "Bearer " + keycloakToken, user.getProviderId(), resetKeycloakPasswordCmd);
+            keycloakService.resetPassword(user.getProviderId(), resetKeycloakPasswordCmd);
 
             WriteLogCmd cmd = commandMapper.from("Change password");
             UserActivityLog userActivityLog = new UserActivityLog(cmd);

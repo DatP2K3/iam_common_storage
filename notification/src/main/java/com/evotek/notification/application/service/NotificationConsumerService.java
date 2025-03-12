@@ -2,6 +2,7 @@ package com.evotek.notification.application.service;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import com.evotek.notification.domain.DeviceRegistration;
 import com.evotek.notification.domain.Notification;
 import com.evotek.notification.domain.command.StoreNotificationDeliveryCmd;
 import com.evotek.notification.domain.repository.DeviceRegistrationDomainRepository;
+import com.evotek.notification.domain.repository.UserTopicDomainRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +34,7 @@ public class NotificationConsumerService {
     private final DeviceRegistrationQueryService deviceRegistrationQueryService;
     private final FirebaseNotificationService firebaseNotificationService;
     private final DeviceRegistrationDomainRepository deviceRegistrationDomainRepository;
+    private final UserTopicDomainRepository userTopicDomainRepository;
 
     @KafkaListener(topics = "send-notification-group")
     public void handleSendNotification(SendNotificationRequest request) {
@@ -54,8 +57,9 @@ public class NotificationConsumerService {
             if (request.getTopic() != null) {
                 firebaseNotificationService.sendNotificationToTopic(request);
                 Notification notification = notificationCommandService.storeNotification(request);
+                List<UUID> userIds = userTopicDomainRepository.getUserIdsByTopic(request.getTopic());
                 List<DeviceRegistration> deviceRegistrations =
-                        deviceRegistrationQueryService.getDeviceByTopicAndEnabled(request.getTopic());
+                        deviceRegistrationQueryService.getDevicesByListUserId(userIds);
                 deviceRegistrations.forEach(deviceRegistration -> {
                     StoreNotificationDeliveryCmd storeNotificationDeliveryCmd = StoreNotificationDeliveryCmd.builder()
                             .notificationId(notification.getId())
@@ -68,20 +72,7 @@ public class NotificationConsumerService {
                 });
             } else {
                 Notification notification = notificationCommandService.storeNotification(request);
-                List<DeviceRegistration> deviceRegistrations =
-                        deviceRegistrationQueryService.getDeviceByUserIdAndEnable(request.getUserId());
-                deviceRegistrations.forEach(deviceRegistration -> {
-                    request.setToken(deviceRegistration.getDeviceToken());
-                    firebaseNotificationService.sendNotificationToToken(request);
-                    StoreNotificationDeliveryCmd storeNotificationDeliveryCmd = StoreNotificationDeliveryCmd.builder()
-                            .notificationId(notification.getId())
-                            .deviceRegistrationId(deviceRegistration.getId())
-                            .status("SENT")
-                            .sendAt(Instant.ofEpochSecond(System.currentTimeMillis()))
-                            .build();
-                    deviceRegistration.addNotificationDelivery(storeNotificationDeliveryCmd);
-                    deviceRegistrationDomainRepository.save(deviceRegistration);
-                });
+                pushNotificationToUser(request, notification.getId());
             }
         } catch (Exception e) {
             log.error("Lỗi xử lý thông báo: {}", e.getMessage(), e);
@@ -97,5 +88,22 @@ public class NotificationConsumerService {
 
         // Gửi email với template Thymeleaf
         emailService.sendTemplateEmail(event.getRecipient(), subject, templateName, event.getParam());
+    }
+
+    private void pushNotificationToUser(PushNotificationRequest request, UUID notificationId) {
+        List<DeviceRegistration> deviceRegistrations =
+                deviceRegistrationQueryService.getDeviceByUserIdAndEnable(request.getUserId());
+        deviceRegistrations.forEach(deviceRegistration -> {
+            request.setToken(deviceRegistration.getDeviceToken());
+            firebaseNotificationService.sendNotificationToToken(request);
+            StoreNotificationDeliveryCmd storeNotificationDeliveryCmd = StoreNotificationDeliveryCmd.builder()
+                    .notificationId(notificationId)
+                    .deviceRegistrationId(deviceRegistration.getId())
+                    .status("SENT")
+                    .sendAt(Instant.ofEpochSecond(System.currentTimeMillis()))
+                    .build();
+            deviceRegistration.addNotificationDelivery(storeNotificationDeliveryCmd);
+            deviceRegistrationDomainRepository.save(deviceRegistration);
+        });
     }
 }

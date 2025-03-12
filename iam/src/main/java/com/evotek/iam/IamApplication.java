@@ -10,7 +10,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
         basePackages = {
             "com.evo.common.iam.client",
             "com.evo.common.storage.client",
-            "com.evotek.iam.infrastructure.adapter.keycloak"
+            "com.evotek.iam.infrastructure.adapter.keycloak",
+            "com.evotek.iam.infrastructure.adapter.notification"
         })
 @SpringBootApplication(scanBasePackages = {"com.evotek.iam", "com.evo.common"})
 public class IamApplication {

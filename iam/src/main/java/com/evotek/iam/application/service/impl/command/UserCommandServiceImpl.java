@@ -32,9 +32,8 @@ import com.evotek.iam.domain.UserRole;
 import com.evotek.iam.domain.command.*;
 import com.evotek.iam.domain.repository.RoleDomainRepository;
 import com.evotek.iam.domain.repository.UserDomainRepository;
-import com.evotek.iam.infrastructure.adapter.keycloak.KeycloakCommandClient;
-import com.evotek.iam.infrastructure.adapter.keycloak.KeycloakIdentityClient;
-import com.evotek.iam.infrastructure.adapter.keycloak.KeycloakQueryClient;
+import com.evotek.iam.infrastructure.adapter.keycloak.KeycloakService;
+import com.evotek.iam.infrastructure.adapter.notification.NotificationService;
 import com.evotek.iam.infrastructure.adapter.storage.FileService;
 import com.evotek.iam.infrastructure.support.exception.*;
 
@@ -46,17 +45,16 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class UserCommandServiceImpl implements UserCommandService {
-    private final KeycloakCommandClient keycloakCommandClient;
+    private final KeycloakService keycloakService;
     private final CommandMapper commandMapper;
     private final PasswordEncoder passwordEncoder;
     private final UserDomainRepository userDomainRepository;
     private final UserDTOMapper userDTOMapper;
     private final RoleDomainRepository roleDomainRepository;
     private final ErrorNormalizer errorNormalizer;
-    private final KeycloakQueryClient keycloakQueryClient;
-    private final KeycloakIdentityClient keycloakIdentityClient;
     private final KafkaTemplate<String, Object> kafkaTemplate;
     private final FileService fileService;
+    private final NotificationService notificationService;
 
     @Value("${auth.keycloak-enabled}")
     boolean keycloakEnabled;
@@ -72,7 +70,7 @@ public class UserCommandServiceImpl implements UserCommandService {
             } else {
                 createUserCmd.setProvider("self_idp");
             }
-            createUserCmd.setProviderId(UUID.fromString(keycloakCommandClient.createKeycloakUser(request)));
+            createUserCmd.setProviderId(UUID.fromString(keycloakService.createKeycloakUser(request)));
             Role role = roleDomainRepository.findByName("ROLE_USER");
             User user = new User(createUserCmd);
             CreateUserRoleCmd createUserRoleCmd = new CreateUserRoleCmd(role.getId());
@@ -80,13 +78,15 @@ public class UserCommandServiceImpl implements UserCommandService {
             user.setUserRole(userRole);
             user = userDomainRepository.save(user);
 
+            notificationService.initUserTopic(user.getSelfUserID());
+
             Map<String, Object> params = SecurityContextUtils.getSecurityContextMap();
             params.put("username", user.getUsername());
             params.put("email", user.getEmail());
             SendNotificationRequest mailAlert = SendNotificationRequest.builder()
                     .channel(Channel.EMAIL.name())
                     .recipient(user.getEmail())
-                    .templateCode(TemplateCode.SIGNIN_ALERT)
+                    .templateCode(TemplateCode.OTP_ALERT)
                     .param(params)
                     .build();
             kafkaTemplate.send(KafkaTopic.SEND_NOTIFICATION_GROUP.getTopicName(), mailAlert);
@@ -99,7 +99,7 @@ public class UserCommandServiceImpl implements UserCommandService {
 
     @Override
     public UserDTO createUser(CreateUserRequest request) {
-        UUID keycloakUserId = UUID.fromString(keycloakCommandClient.createKeycloakUser(request));
+        UUID keycloakUserId = UUID.fromString(keycloakService.createKeycloakUser(request));
 
         CreateUserCmd createUserCmd = commandMapper.from(request);
         createUserCmd.setPassword(passwordEncoder.encode(createUserCmd.getPassword()));
@@ -134,12 +134,11 @@ public class UserCommandServiceImpl implements UserCommandService {
         User user = userDomainRepository.getByUsername(username);
         UUID keycloakUserId = user.getProviderId();
 
-        String token = keycloakQueryClient.getClientToken();
         if (passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
             ResetKeycloakPasswordCmd resetKeycloakPasswordCmd = ResetKeycloakPasswordCmd.builder()
                     .value(changePasswordCmd.getNewPassword())
                     .build();
-            keycloakCommandClient.resetPassword(token, keycloakUserId, resetKeycloakPasswordCmd);
+            keycloakService.resetPassword(keycloakUserId, resetKeycloakPasswordCmd);
 
             user.changePassword(passwordEncoder.encode(request.getNewPassword()));
             WriteLogCmd logCmd = commandMapper.from("Change Password");
@@ -339,12 +338,7 @@ public class UserCommandServiceImpl implements UserCommandService {
             User user = userDomainRepository.getByUsername(username);
             user.setLocked(!enabled);
             userDomainRepository.save(user);
-            String token = keycloakQueryClient.getClientToken();
-            keycloakIdentityClient.lockUser(
-                    "Bearer " + token,
-                    user.getProviderId().toString(),
-                    LockUserCmd.builder().enabled(enabled).build());
-
+            keycloakService.lockUser(user.getProviderId(), enabled);
             Map<String, Object> params = SecurityContextUtils.getSecurityContextMap();
             params.put("username", username);
             SendNotificationRequest mailAlert = SendNotificationRequest.builder()
