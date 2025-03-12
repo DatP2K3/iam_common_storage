@@ -1,5 +1,6 @@
 package com.evotek.notification.infrastructure.domainrepository;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -78,13 +79,6 @@ public class DeviceRegistrationDomainRepositoryImpl
     }
 
     @Override
-    public List<DeviceRegistration> findByTopic(String topic) {
-        List<DeviceRegistrationEntity> deviceRegistrationEntities =
-                deviceRegistrationEntityRepository.findByTopic(topic);
-        return this.enrichList(deviceRegistrationEntityMapper.toDomainModelList(deviceRegistrationEntities));
-    }
-
-    @Override
     public DeviceRegistration findByDeviceIdAndUserId(UUID deviceId, UUID userId) {
         DeviceRegistrationEntity deviceRegistrationEntity = deviceRegistrationEntityRepository
                 .findByDeviceIdAndUserId(deviceId, userId)
@@ -93,6 +87,32 @@ public class DeviceRegistrationDomainRepositoryImpl
             return this.enrich(deviceRegistrationEntityMapper.toDomainModel(deviceRegistrationEntity));
         }
         return null;
+    }
+
+    @Override
+    public List<String> getDeviceTokensByUserId(UUID userId) {
+        return deviceRegistrationEntityRepository.findDeviceTokenByUserId(userId);
+    }
+
+    @Override
+    public List<DeviceRegistration> findByUserIdInAndEnabledTrue(List<UUID> userIds) {
+        List<DeviceRegistrationEntity> deviceRegistrationEntities =
+                deviceRegistrationEntityRepository.findByUserIdInAndEnabledTrue(userIds);
+        return this.enrichList(deviceRegistrationEntityMapper.toDomainModelList(deviceRegistrationEntities));
+    }
+
+    @Override
+    public List<DeviceRegistration> findInactivatedDevices(Instant cutoffDate) {
+        List<DeviceRegistrationEntity> deviceRegistrationEntities =
+                deviceRegistrationEntityRepository.findInactivatedDevices(cutoffDate);
+        return this.enrichList(deviceRegistrationEntityMapper.toDomainModelList(deviceRegistrationEntities));
+    }
+
+    @Override
+    public void hardDeleteDeviceRegistration(List<DeviceRegistration> deviceRegistrations) {
+        List<DeviceRegistrationEntity> deviceRegistrationEntities =
+                deviceRegistrationEntityMapper.toEntityList(deviceRegistrations);
+        deviceRegistrationEntityRepository.deleteAll(deviceRegistrationEntities);
     }
 
     @Override

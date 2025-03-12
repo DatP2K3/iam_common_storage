@@ -8,7 +8,8 @@ public enum TemplateCode {
     SIGNIN_ALERT("signin-alert", "Security Alert - Created New Account"),
     REQUEST_CHANGE_PASSWORD("requestChangePassword-alert", "Request Change Password"),
     PASSWORD_CHANGE_ALERT("changePassword-alert", "Password Changed Successfully"),
-    LOCK_USER_ALERT("lockUser-alert", "Account Locked");
+    LOCK_USER_ALERT("lockUser-alert", "Account Locked"),
+    OTP_ALERT("otp-alert", "OTP Alert");
 
     private final String templateName;
     private final String subject;

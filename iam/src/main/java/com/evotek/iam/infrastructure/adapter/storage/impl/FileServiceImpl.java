@@ -1,4 +1,4 @@
-package com.evotek.iam.infrastructure.adapter.storage;
+package com.evotek.iam.infrastructure.adapter.storage.impl;
 
 import java.util.List;
 import java.util.UUID;
@@ -11,6 +11,7 @@ import com.evo.common.dto.request.UpdateFileRequest;
 import com.evo.common.dto.response.ApiResponses;
 import com.evo.common.dto.response.FileResponse;
 import com.evo.common.storage.client.StorageClient;
+import com.evotek.iam.infrastructure.adapter.storage.FileService;
 
 import lombok.RequiredArgsConstructor;
 

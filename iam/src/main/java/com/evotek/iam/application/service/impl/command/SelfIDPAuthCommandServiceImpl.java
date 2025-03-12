@@ -26,7 +26,6 @@ import com.evo.common.support.SecurityContextUtils;
 import com.evotek.iam.application.configuration.TokenProvider;
 import com.evotek.iam.application.dto.request.LoginRequest;
 import com.evotek.iam.application.dto.request.VerifyOtpRequest;
-import com.evotek.iam.application.dto.request.identityKeycloak.GetTokenRequest;
 import com.evotek.iam.application.dto.response.TokenDTO;
 import com.evotek.iam.application.mapper.CommandMapper;
 import com.evotek.iam.application.service.AuthServiceCommand;
@@ -37,7 +36,7 @@ import com.evotek.iam.domain.command.ResetKeycloakPasswordCmd;
 import com.evotek.iam.domain.command.VerifyOtpCmd;
 import com.evotek.iam.domain.command.WriteLogCmd;
 import com.evotek.iam.domain.repository.UserDomainRepository;
-import com.evotek.iam.infrastructure.adapter.keycloak.KeycloakIdentityClient;
+import com.evotek.iam.infrastructure.adapter.keycloak.KeycloakService;
 import com.evotek.iam.infrastructure.support.exception.AuthErrorCode;
 import com.evotek.iam.infrastructure.support.exception.AuthException;
 import com.evotek.iam.infrastructure.support.exception.ErrorNormalizer;
@@ -60,23 +59,17 @@ public class SelfIDPAuthCommandServiceImpl implements AuthServiceCommand {
     private final ErrorNormalizer errorNormalizer;
     private final RedisTemplate<String, String> redisTemplate;
     private final TokenProvider tokenProvider;
-    private final KeycloakIdentityClient keycloakIdentityClient;
     private final CommandMapper commandMapper;
     private final KafkaTemplate<String, SendNotificationRequest> kafkaTemplate;
     private static final String INVALID_REFRESH_TOKEN_CACHE = "invalid-refresh-token";
     private static final String INVALID_TOKEN_CACHE = "invalid-access-token";
+    private final KeycloakService keycloakService;
 
     @Value("${jwt.valid-duration}")
     private long validDuration;
 
     @Value("${jwt.refreshable-duration}")
     private long refreshDuration;
-
-    @Value("${idp.client-id}")
-    private String clientId;
-
-    @Value("${idp.client-secret}")
-    private String clientSecret;
 
     public String generateToken(User user, boolean isForgotPassword, boolean isRefresh) {
         JWSHeader header = new JWSHeader(JWSAlgorithm.RS256);
@@ -117,17 +110,28 @@ public class SelfIDPAuthCommandServiceImpl implements AuthServiceCommand {
         SecureRandom random = new SecureRandom();
         int otp = random.nextInt(900000) + 100000;
         redisTemplate.opsForValue().set(String.valueOf(otp), user.getUsername(), 300, TimeUnit.SECONDS);
-        //        emailService.sendMailOtp(user.getEmail(), String.valueOf(otp));
+
+        Map<String, Object> params = SecurityContextUtils.getSecurityContextMap();
+        params.put("otp", otp);
+        params.put("username", user.getUsername());
+        SendNotificationRequest mailAlert = SendNotificationRequest.builder()
+                .channel(Channel.EMAIL.name())
+                .recipient(user.getEmail())
+                .templateCode(TemplateCode.OTP_ALERT)
+                .param(params)
+                .build();
+        kafkaTemplate.send(KafkaTopic.SEND_NOTIFICATION_GROUP.getTopicName(), mailAlert);
         return null;
     }
 
     public TokenDTO verifyOtp(VerifyOtpRequest verifyOtpRequest) {
         VerifyOtpCmd cmd = commandMapper.from(verifyOtpRequest);
-        if (!redisTemplate.hasKey(cmd.getOtp())) {
+        if (redisTemplate.hasKey(cmd.getOtp()) == null) {
             throw new AuthException(AuthErrorCode.UNAUTHENTICATED);
         }
-        String otpStored = redisTemplate.opsForValue().get(cmd.getOtp());
-        if (otpStored != null && !otpStored.equals(cmd.getUsername())) {
+
+        String userName = redisTemplate.opsForValue().get(cmd.getOtp());
+        if (userName != null && !userName.equals(cmd.getUsername())) {
             throw new AuthException(AuthErrorCode.UNAUTHENTICATED);
         }
         User user = userDomainRepository.getByUsername((cmd.getUsername()));
@@ -251,16 +255,7 @@ public class SelfIDPAuthCommandServiceImpl implements AuthServiceCommand {
             User user = userDomainRepository.getByUsername(username);
             user.changePassword(passwordEncoder.encode(resetKeycloakPasswordCmd.getValue()));
 
-            var keycloakToken = keycloakIdentityClient.getToken(GetTokenRequest.builder()
-                    .grant_type("client_credentials")
-                    .client_id(clientId)
-                    .client_secret(clientSecret)
-                    .scope("openid")
-                    .build());
-            keycloakIdentityClient.resetPassword(
-                    "Bearer " + keycloakToken.getAccessToken(),
-                    user.getProviderId().toString(),
-                    resetKeycloakPasswordCmd);
+            keycloakService.resetPassword(user.getProviderId(), resetKeycloakPasswordCmd);
             WriteLogCmd cmd = commandMapper.from("Change password");
             UserActivityLog userActivityLog = new UserActivityLog(cmd);
             user.setUserActivityLog(userActivityLog);

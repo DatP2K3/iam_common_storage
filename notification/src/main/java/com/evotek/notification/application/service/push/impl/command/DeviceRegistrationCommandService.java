@@ -32,15 +32,13 @@ public class DeviceRegistrationCommandService {
 
         DeviceRegistration existingDeviceRegistration =
                 deviceRegistrationDomainRepository.findByDeviceIdAndUserId(request.getDeviceId(), request.getUserId());
-        if (existingDeviceRegistration != null && !existingDeviceRegistration.isEnabled()) {
+        if (existingDeviceRegistration != null) {
             existingDeviceRegistration.setEnabled(true);
+            subscribeTokenTopic(registerOrUpdateDeviceCmd.getDeviceToken(), registerOrUpdateDeviceCmd.getUserId());
             deviceRegistrationDomainRepository.save(existingDeviceRegistration);
         } else {
             DeviceRegistration deviceRegistration = new DeviceRegistration(registerOrUpdateDeviceCmd);
-            subscribeTokenTopic(
-                    deviceRegistration,
-                    registerOrUpdateDeviceCmd.getDeviceToken(),
-                    registerOrUpdateDeviceCmd.getUserId());
+            subscribeTokenTopic(registerOrUpdateDeviceCmd.getDeviceToken(), registerOrUpdateDeviceCmd.getUserId());
             deviceRegistrationDomainRepository.save(deviceRegistration);
         }
     }
@@ -50,19 +48,18 @@ public class DeviceRegistrationCommandService {
                 unRegisterDeviceRequest.getDeviceId(), unRegisterDeviceRequest.getUserId());
         if (deviceRegistration != null) {
             deviceRegistration.setEnabled(false);
-            deviceRegistration.removeAllSubscribedTopics();
             deviceRegistrationDomainRepository.save(deviceRegistration);
-            unsubscribeDeviceFromTopic(unRegisterDeviceRequest, deviceRegistration.getTopics());
+            List<String> topics = userTopicDomainRepository.findTopicEnabled(deviceRegistration.getUserId());
+            unsubscribeDeviceFromTopic(unRegisterDeviceRequest, topics);
         }
     }
 
-    public void subscribeTokenTopic(DeviceRegistration deviceRegistration, String deviceToken, UUID userId) {
+    public void subscribeTokenTopic(String deviceToken, UUID userId) {
         List<String> fcmTopics = userTopicDomainRepository.findTopicEnabled(userId);
         fcmTopics.forEach(topic -> {
             try {
                 FirebaseMessaging.getInstance(FirebaseApp.getInstance("my-app"))
                         .subscribeToTopic(List.of(deviceToken), topic);
-                deviceRegistration.addSubscribedTopic(topic);
             } catch (FirebaseMessagingException e) {
                 throw new AppException(AppErrorCode.FIREBASE_SUBSCRIBE_TOPIC_FAILED);
             }
@@ -77,7 +74,6 @@ public class DeviceRegistrationCommandService {
             } catch (FirebaseMessagingException e) {
                 throw new AppException(AppErrorCode.FIREBASE_SUBSCRIBE_TOPIC_FAILED);
             }
-            ;
         });
     }
 }

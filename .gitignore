@@ -1,4 +1,5 @@
-/.idea/
-/logs/
-/uploads/
-/exports/
+.idea/
+logs/
+uploads/
+exports/
+notification/src/main/resources/firebase-service-account.json

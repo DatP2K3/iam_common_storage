@@ -15,15 +15,11 @@ import lombok.RequiredArgsConstructor;
 public class DeviceRegistrationQueryService {
     private final DeviceRegistrationDomainRepository deviceRegistrationDomainRepository;
 
-    public List<DeviceRegistration> getDeviceByTokenAndEnable(String token) {
-        return deviceRegistrationDomainRepository.findByDeviceTokenAndEnabled(token);
-    }
-
-    public List<DeviceRegistration> getDeviceByTopicAndEnabled(String topic) {
-        return deviceRegistrationDomainRepository.findByTopic(topic);
-    }
-
     public List<DeviceRegistration> getDeviceByUserIdAndEnable(UUID token) {
         return deviceRegistrationDomainRepository.findByUserIdAndEnabled(token);
+    }
+
+    public List<DeviceRegistration> getDevicesByListUserId(List<UUID> userIds) {
+        return deviceRegistrationDomainRepository.findByUserIdInAndEnabledTrue(userIds);
     }
 }

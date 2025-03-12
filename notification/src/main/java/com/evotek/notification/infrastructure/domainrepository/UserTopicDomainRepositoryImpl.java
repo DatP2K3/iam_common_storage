@@ -40,16 +40,13 @@ public class UserTopicDomainRepositoryImpl extends AbstractDomainRepository<User
     }
 
     @Override
-    public List<UserTopic> findByUserIdAndEnabled(UUID userId) {
-        List<UserTopicEntity> userTopicEntities = userTopicEntityRepository.findByUserIdAndEnabledTrue(userId);
-        return userTopicEntityMapper.toDomainModelList(userTopicEntities);
-    }
-
-    @Override
     public List<UserTopic> findByUserId(UUID userId) {
         List<UserTopicEntity> userTopicEntities = userTopicEntityRepository.findByUserId(userId);
         return userTopicEntityMapper.toDomainModelList(userTopicEntities);
     }
 
-
+    @Override
+    public List<UUID> getUserIdsByTopic(String topic) {
+        return userTopicEntityRepository.findUserIdByTopic(topic);
+    }
 }
