@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import com.evo.common.repository.AbstractDomainRepository;
 import jakarta.transaction.Transactional;
 
 import org.springframework.stereotype.Repository;
@@ -70,7 +71,7 @@ public class UserDomainRepositoryImpl extends AbstractDomainRepository<User, Use
             UserActivityLogEntity userActivityLogEntity = userActivityLogEntityMapper.toEntity(userActivityLog);
             userActivityLogEntityRepository.save(userActivityLogEntity);
         }
-        return userEntityMapper.toDomainModel(userEntityRepository.save(userEntity));
+        return this.enrich(userEntityMapper.toDomainModel(userEntityRepository.save(userEntity)));
     }
 
     @Override

@@ -1,12 +1,11 @@
-package com.evotek.iam.infrastructure.domainrepository;
+package com.evo.common.repository;
 
 import java.util.List;
-// ném lên common
 
 public interface DomainRepository<D, ID> {
     D save(D entity);
 
-    List<D> saveAll(List<D> entities);
+    List<D> saveAll(List<D> domains);
 
     List<D> findAllByIds(List<ID> ids);
 

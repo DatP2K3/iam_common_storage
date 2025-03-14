@@ -10,8 +10,8 @@ import lombok.*;
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class RefreshTokenRequest {
-    private String clientId;
-    private String clientSecret;
-    private String grantType;
-    private String refreshToken;
+    private String client_id;
+    private String client_secret;
+    private String grant_type;
+    private String refresh_token;
 }

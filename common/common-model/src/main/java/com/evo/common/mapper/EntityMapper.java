@@ -1,4 +1,4 @@
-package com.evotek.iam.infrastructure.persistence.mapper;
+package com.evo.common.mapper;
 
 import java.util.List;
 

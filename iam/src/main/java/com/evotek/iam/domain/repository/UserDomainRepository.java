@@ -3,9 +3,9 @@ package com.evotek.iam.domain.repository;
 import java.util.List;
 import java.util.UUID;
 
+import com.evo.common.repository.DomainRepository;
 import com.evotek.iam.domain.User;
 import com.evotek.iam.domain.query.SearchUserQuery;
-import com.evotek.iam.infrastructure.domainrepository.DomainRepository;
 
 public interface UserDomainRepository extends DomainRepository<User, UUID> {
     List<User> search(SearchUserQuery query);

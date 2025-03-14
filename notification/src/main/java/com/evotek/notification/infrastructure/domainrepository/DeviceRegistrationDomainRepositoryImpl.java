@@ -8,6 +8,7 @@ import jakarta.transaction.Transactional;
 
 import org.springframework.stereotype.Repository;
 
+import com.evo.common.repository.AbstractDomainRepository;
 import com.evotek.notification.domain.DeviceRegistration;
 import com.evotek.notification.domain.NotificationDelivery;
 import com.evotek.notification.domain.repository.DeviceRegistrationDomainRepository;

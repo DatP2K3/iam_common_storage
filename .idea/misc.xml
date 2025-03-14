@@ -13,6 +13,7 @@
         <option value="$PROJECT_DIR$/notification/pom.xml" />
         <option value="$PROJECT_DIR$/common/common-persistence/pom.xml" />
         <option value="$PROJECT_DIR$/iam/pom.xml" />
+        <option value="$PROJECT_DIR$/elasticsearch/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">
@@ -33,7 +34,6 @@
         <option value="notification" />
         <option value="evo-common" />
         <option value="common-model" />
-        <option value="iam (1)" />
         <option value="common-web" />
         <option value="storage" />
         <option value="config" />

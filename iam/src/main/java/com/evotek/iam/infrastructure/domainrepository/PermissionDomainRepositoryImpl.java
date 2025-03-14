@@ -3,6 +3,7 @@ package com.evotek.iam.infrastructure.domainrepository;
 import java.util.List;
 import java.util.UUID;
 
+import com.evo.common.repository.AbstractDomainRepository;
 import org.springframework.stereotype.Repository;
 
 import com.evotek.iam.domain.Permission;

@@ -175,7 +175,7 @@ public class UserController {
                 .pageIndex(searchUserRequest.getPageIndex())
                 .totalElements(totalUsers)
                 .totalPages((int) (Math.ceil((double) totalUsers / searchUserRequest.getPageSize())))
-                .hasNext(searchUserRequest.getPageIndex() + searchUserRequest.getPageSize() < totalUsers)
+                .hasNext((searchUserRequest.getPageIndex() + 1L) * searchUserRequest.getPageSize() < totalUsers)
                 .hasPrevious(searchUserRequest.getPageIndex() > 1)
                 .build();
 

@@ -154,11 +154,6 @@
 			<version>${common.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.evo.common</groupId>
-			<artifactId>common-persistence</artifactId>
-			<version>${common.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>io.netty</groupId>
 			<artifactId>netty-resolver-dns-native-macos</artifactId>
 			<classifier>osx-aarch_64</classifier>

@@ -10,9 +10,9 @@ import lombok.*;
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class GetTokenRequest {
-    private String grantType;
-    private String clientId;
-    private String clientSecret;
+    private String grant_type;
+    private String client_id;
+    private String client_secret;
     private String scope;
     private String username;
     private String password;

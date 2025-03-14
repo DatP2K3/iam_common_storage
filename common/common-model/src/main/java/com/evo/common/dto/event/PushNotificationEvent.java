@@ -1,4 +1,4 @@
-package com.evo.common.dto.request;
+package com.evo.common.dto.event;
 
 import java.util.Map;
 import java.util.UUID;
@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PushNotificationRequest {
+public class PushNotificationEvent {
     private String title;
     private String body;
     private String imageUrl;

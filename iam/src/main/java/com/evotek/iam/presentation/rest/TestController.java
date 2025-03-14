@@ -1,8 +1,8 @@
 package com.evotek.iam.presentation.rest;
 
+import com.evo.common.dto.event.PushNotificationEvent;
 import org.springframework.web.bind.annotation.*;
 
-import com.evo.common.dto.request.PushNotificationRequest;
 import com.evo.common.dto.response.ApiResponses;
 import com.evotek.iam.application.service.UserCommandService;
 
@@ -15,8 +15,8 @@ public class TestController {
     private final UserCommandService userCommandService;
 
     @GetMapping("/fcm")
-    public ApiResponses<Void> testTopic(@RequestBody PushNotificationRequest pushNotificationRequest) {
-        userCommandService.testFcm(pushNotificationRequest);
+    public ApiResponses<Void> testTopic(@RequestBody PushNotificationEvent pushNotificationEvent) {
+        userCommandService.testFcm(pushNotificationEvent);
         return ApiResponses.<Void>builder()
                 .success(true)
                 .code(200)

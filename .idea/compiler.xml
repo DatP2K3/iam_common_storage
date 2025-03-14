@@ -22,7 +22,7 @@
         <module name="common-model" />
         <module name="common-web" />
       </profile>
-      <profile name="Annotation profile for storage" enabled="true">
+      <profile name="Annotation profile for elasticsearch" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -32,13 +32,13 @@
           <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct/1.6.3/mapstruct-1.6.3.jar" />
         </processorPath>
         <module name="notification" />
-        <module name="iam (1)" />
         <module name="storage" />
+        <module name="elasticsearch" />
+        <module name="iam" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="common-persistence" target="21" />
-      <module name="iam" target="21" />
       <module name="spring-boot-starter-parent" target="1.5" />
     </bytecodeTargetLevel>
   </component>
@@ -49,9 +49,9 @@
       <module name="common-persistence" options="-parameters" />
       <module name="common-web" options="-parameters" />
       <module name="config" options="-parameters" />
+      <module name="elasticsearch" options="-parameters" />
       <module name="gateway" options="-parameters" />
       <module name="iam" options="-parameters" />
-      <module name="iam (1)" options="-parameters" />
       <module name="notification" options="-parameters" />
       <module name="storage" options="-parameters" />
     </option>

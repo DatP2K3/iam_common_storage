@@ -18,7 +18,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import com.evo.common.dto.request.SendNotificationRequest;
+import com.evo.common.dto.event.SendNotificationEvent;
 import com.evo.common.enums.Channel;
 import com.evo.common.enums.KafkaTopic;
 import com.evo.common.enums.TemplateCode;
@@ -60,7 +60,7 @@ public class SelfIDPAuthCommandServiceImpl implements AuthServiceCommand {
     private final RedisTemplate<String, String> redisTemplate;
     private final TokenProvider tokenProvider;
     private final CommandMapper commandMapper;
-    private final KafkaTemplate<String, SendNotificationRequest> kafkaTemplate;
+    private final KafkaTemplate<String, SendNotificationEvent> kafkaTemplate;
     private static final String INVALID_REFRESH_TOKEN_CACHE = "invalid-refresh-token";
     private static final String INVALID_TOKEN_CACHE = "invalid-access-token";
     private final KeycloakService keycloakService;
@@ -114,7 +114,7 @@ public class SelfIDPAuthCommandServiceImpl implements AuthServiceCommand {
         Map<String, Object> params = SecurityContextUtils.getSecurityContextMap();
         params.put("otp", otp);
         params.put("username", user.getUsername());
-        SendNotificationRequest mailAlert = SendNotificationRequest.builder()
+        SendNotificationEvent mailAlert = SendNotificationEvent.builder()
                 .channel(Channel.EMAIL.name())
                 .recipient(user.getEmail())
                 .templateCode(TemplateCode.OTP_ALERT)
@@ -144,7 +144,7 @@ public class SelfIDPAuthCommandServiceImpl implements AuthServiceCommand {
         userDomainRepository.save(user);
 
         Map<String, Object> params = SecurityContextUtils.getSecurityContextMap();
-        SendNotificationRequest mailAlert = SendNotificationRequest.builder()
+        SendNotificationEvent mailAlert = SendNotificationEvent.builder()
                 .channel(Channel.EMAIL.name())
                 .recipient(user.getEmail())
                 .templateCode(TemplateCode.LOGIN_ALERT)
@@ -211,7 +211,7 @@ public class SelfIDPAuthCommandServiceImpl implements AuthServiceCommand {
             String resetUrl = "http://127.0.0.1:5500/resetPassword.html?token=" + token;
             Map<String, Object> params = SecurityContextUtils.getSecurityContextMap();
             params.put("resetUrl", resetUrl);
-            SendNotificationRequest mailAlert = SendNotificationRequest.builder()
+            SendNotificationEvent mailAlert = SendNotificationEvent.builder()
                     .channel(Channel.EMAIL.name())
                     .recipient(user.getEmail())
                     .templateCode(TemplateCode.REQUEST_CHANGE_PASSWORD)
@@ -262,7 +262,7 @@ public class SelfIDPAuthCommandServiceImpl implements AuthServiceCommand {
             userDomainRepository.save(user);
 
             Map<String, Object> params = SecurityContextUtils.getSecurityContextMap();
-            SendNotificationRequest mailAlert = SendNotificationRequest.builder()
+            SendNotificationEvent mailAlert = SendNotificationEvent.builder()
                     .channel(Channel.EMAIL.name())
                     .recipient(user.getEmail())
                     .templateCode(TemplateCode.PASSWORD_CHANGE_ALERT)

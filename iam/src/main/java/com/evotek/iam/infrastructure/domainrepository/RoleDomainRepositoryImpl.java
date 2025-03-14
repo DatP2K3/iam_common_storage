@@ -3,6 +3,7 @@ package com.evotek.iam.infrastructure.domainrepository;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.evo.common.repository.AbstractDomainRepository;
 import jakarta.transaction.Transactional;
 
 import org.springframework.stereotype.Repository;

@@ -1,4 +1,4 @@
-package com.evo.common.dto.request;
+package com.evo.common.dto.event;
 
 import java.util.Map;
 
@@ -10,7 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SendNotificationRequest {
+public class SendNotificationEvent {
     private String channel;
     private String recipient;
     private TemplateCode templateCode;

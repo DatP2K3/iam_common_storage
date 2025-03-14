@@ -17,7 +17,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import com.evo.common.dto.request.SendNotificationRequest;
+import com.evo.common.dto.event.SendNotificationEvent;
 import com.evo.common.enums.Channel;
 import com.evo.common.enums.KafkaTopic;
 import com.evo.common.enums.TemplateCode;
@@ -55,7 +55,7 @@ public class KeycloakAuthCommandServiceImpl implements AuthServiceCommand {
     private final UserDomainRepository userDomainRepository;
     private final CommandMapper commandMapper;
     private final TokenProvider tokenProvider;
-    private final KafkaTemplate<String, SendNotificationRequest> kafkaTemplate;
+    private final KafkaTemplate<String, SendNotificationEvent> kafkaTemplate;
 
     @Value("${jwt.valid-duration}")
     private long validDuration;
@@ -76,7 +76,7 @@ public class KeycloakAuthCommandServiceImpl implements AuthServiceCommand {
 
             Map<String, Object> params = SecurityContextUtils.getSecurityContextMap();
             params.put("username", loginRequest.getUsername());
-            SendNotificationRequest mailAlert = SendNotificationRequest.builder()
+            SendNotificationEvent mailAlert = SendNotificationEvent.builder()
                     .channel(Channel.EMAIL.name())
                     .recipient(user.getEmail())
                     .templateCode(TemplateCode.LOGIN_ALERT)
@@ -131,7 +131,7 @@ public class KeycloakAuthCommandServiceImpl implements AuthServiceCommand {
             Map<String, Object> params = SecurityContextUtils.getSecurityContextMap();
             params.put("resetUrl", resetUrl);
             params.put("username", username);
-            SendNotificationRequest mailAlert = SendNotificationRequest.builder()
+            SendNotificationEvent mailAlert = SendNotificationEvent.builder()
                     .channel(Channel.EMAIL.name())
                     .recipient(user.getEmail())
                     .templateCode(TemplateCode.REQUEST_CHANGE_PASSWORD)
@@ -159,7 +159,7 @@ public class KeycloakAuthCommandServiceImpl implements AuthServiceCommand {
             userDomainRepository.save(user);
 
             Map<String, Object> params = SecurityContextUtils.getSecurityContextMap();
-            SendNotificationRequest mailAlert = SendNotificationRequest.builder()
+            SendNotificationEvent mailAlert = SendNotificationEvent.builder()
                     .channel(Channel.EMAIL.name())
                     .recipient(user.getEmail())
                     .templateCode(TemplateCode.PASSWORD_CHANGE_ALERT)

@@ -6,7 +6,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.evo.common.dto.request.PushNotificationRequest;
+import com.evo.common.dto.event.PushNotificationEvent;
 import com.evotek.iam.application.dto.request.ChangePasswordRequest;
 import com.evotek.iam.application.dto.request.CreateUserRequest;
 import com.evotek.iam.application.dto.request.UpdateUserRequest;
@@ -28,5 +28,5 @@ public interface UserCommandService {
 
     void lockUser(String username, boolean enabled);
 
-    void testFcm(PushNotificationRequest pushNotificationRequest);
+    void testFcm(PushNotificationEvent pushNotificationEvent);
 }

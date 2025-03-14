@@ -81,9 +81,9 @@ public class KeycloakServiceImpl implements KeycloakService {
             keycloakIdentityClient.logout(
                     authorizationHeader,
                     LogoutRequest.builder()
-                            .clientId(clientId)
-                            .clientSecret(clientSecret)
-                            .refreshToken(refreshToken)
+                            .client_id(clientId)
+                            .client_secret(clientSecret)
+                            .refresh_token(refreshToken)
                             .build());
         } catch (FeignException e) {
             throw errorNormalizer.handleKeyCloakException(e);
@@ -94,10 +94,10 @@ public class KeycloakServiceImpl implements KeycloakService {
     public TokenDTO refreshToken(String refreshToken) {
         try {
             RefreshTokenRequest refreshTokenRequest = RefreshTokenRequest.builder()
-                    .clientId(clientId)
-                    .clientSecret(clientSecret)
-                    .grantType("refresh_token")
-                    .refreshToken(refreshToken)
+                    .client_id(clientId)
+                    .client_secret(clientSecret)
+                    .grant_type("refresh_token")
+                    .refresh_token(refreshToken)
                     .build();
             return keycloakIdentityClient.refreshToken(refreshTokenRequest);
         } catch (FeignException e) {
@@ -109,9 +109,9 @@ public class KeycloakServiceImpl implements KeycloakService {
     public String getClientToken() {
         try {
             TokenDTO tokenDTO = keycloakIdentityClient.getToken(GetTokenRequest.builder()
-                    .grantType("client_credentials")
-                    .clientId(clientId)
-                    .clientSecret(clientSecret)
+                    .grant_type("client_credentials")
+                    .client_id(clientId)
+                    .client_secret(clientSecret)
                     .scope("openid")
                     .build());
             return tokenDTO.getAccessToken();
@@ -124,9 +124,9 @@ public class KeycloakServiceImpl implements KeycloakService {
     public TokenDTO authenticate(LoginRequest request) {
         try {
             return keycloakIdentityClient.getToken(GetTokenRequest.builder()
-                    .grantType("password")
-                    .clientId(clientId)
-                    .clientSecret(clientSecret)
+                    .grant_type("password")
+                    .client_id(clientId)
+                    .client_secret(clientSecret)
                     .scope("openid")
                     .username(request.getUsername())
                     .password(request.getPassword())

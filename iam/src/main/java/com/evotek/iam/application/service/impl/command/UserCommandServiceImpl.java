@@ -4,6 +4,11 @@ import java.io.IOException;
 import java.time.ZoneId;
 import java.util.*;
 
+import com.evo.common.dto.event.PushNotificationEvent;
+import com.evo.common.dto.event.SyncUserEvent;
+import com.evo.common.dto.request.SyncUserRequest;
+import com.evo.common.enums.SyncUserType;
+import com.evotek.iam.application.mapper.SyncMapper;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -11,8 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.evo.common.dto.request.PushNotificationRequest;
-import com.evo.common.dto.request.SendNotificationRequest;
+import com.evo.common.dto.event.SendNotificationEvent;
 import com.evo.common.dto.response.FileResponse;
 import com.evo.common.enums.Channel;
 import com.evo.common.enums.KafkaTopic;
@@ -55,6 +59,7 @@ public class UserCommandServiceImpl implements UserCommandService {
     private final KafkaTemplate<String, Object> kafkaTemplate;
     private final FileService fileService;
     private final NotificationService notificationService;
+    private final SyncMapper syncMapper;
 
     @Value("${auth.keycloak-enabled}")
     boolean keycloakEnabled;
@@ -83,13 +88,20 @@ public class UserCommandServiceImpl implements UserCommandService {
             Map<String, Object> params = SecurityContextUtils.getSecurityContextMap();
             params.put("username", user.getUsername());
             params.put("email", user.getEmail());
-            SendNotificationRequest mailAlert = SendNotificationRequest.builder()
+            SendNotificationEvent mailAlert = SendNotificationEvent.builder()
                     .channel(Channel.EMAIL.name())
                     .recipient(user.getEmail())
                     .templateCode(TemplateCode.OTP_ALERT)
                     .param(params)
                     .build();
             kafkaTemplate.send(KafkaTopic.SEND_NOTIFICATION_GROUP.getTopicName(), mailAlert);
+
+            SyncUserRequest syncUserRequest = syncMapper.from(user);
+            SyncUserEvent syncUserEvent = SyncUserEvent.builder()
+                    .syncUserType(SyncUserType.USER_CREATED)
+                    .syncUserRequest(syncUserRequest)
+                    .build();
+            kafkaTemplate.send(KafkaTopic.SYNC_USER_GROUP.getTopicName(), syncUserEvent);
 
             return userDTOMapper.domainModelToDTO(user);
         } catch (FeignException e) {
@@ -116,13 +128,20 @@ public class UserCommandServiceImpl implements UserCommandService {
         Map<String, Object> params = SecurityContextUtils.getSecurityContextMap();
         params.put("username", user.getUsername());
         params.put("email", user.getEmail());
-        SendNotificationRequest mailAlert = SendNotificationRequest.builder()
+        SendNotificationEvent mailAlert = SendNotificationEvent.builder()
                 .channel(Channel.EMAIL.name())
                 .recipient(user.getEmail())
                 .templateCode(TemplateCode.SIGNIN_ALERT)
                 .param(params)
                 .build();
         kafkaTemplate.send(KafkaTopic.SEND_NOTIFICATION_GROUP.getTopicName(), mailAlert);
+
+        SyncUserRequest syncUserRequest = syncMapper.from(user);
+        SyncUserEvent syncUserEvent = SyncUserEvent.builder()
+                .syncUserType(SyncUserType.USER_CREATED)
+                .syncUserRequest(syncUserRequest)
+                .build();
+        kafkaTemplate.send(KafkaTopic.SYNC_USER_GROUP.getTopicName(), syncUserEvent);
 
         return userDTOMapper.domainModelToDTO(user);
     }
@@ -147,14 +166,13 @@ public class UserCommandServiceImpl implements UserCommandService {
             userDomainRepository.save(user);
 
             Map<String, Object> params = SecurityContextUtils.getSecurityContextMap();
-            SendNotificationRequest mailAlert = SendNotificationRequest.builder()
+            SendNotificationEvent mailAlert = SendNotificationEvent.builder()
                     .channel(Channel.EMAIL.name())
                     .recipient(user.getEmail())
                     .templateCode(TemplateCode.PASSWORD_CHANGE_ALERT)
                     .param(params)
                     .build();
             kafkaTemplate.send(KafkaTopic.SEND_NOTIFICATION_GROUP.getTopicName(), mailAlert);
-
         } else {
             throw new AuthException(AuthErrorCode.INVALID_PASSWORD);
         }
@@ -173,6 +191,12 @@ public class UserCommandServiceImpl implements UserCommandService {
         user.setUserActivityLog(userActivityLog);
         userDomainRepository.save(user);
 
+        SyncUserRequest syncUserRequest = syncMapper.from(user);
+        SyncUserEvent syncUserEvent = SyncUserEvent.builder()
+                .syncUserType(SyncUserType.USER_UPDATED)
+                .syncUserRequest(syncUserRequest)
+                .build();
+        kafkaTemplate.send(KafkaTopic.SYNC_USER_GROUP.getTopicName(), syncUserEvent);
         return avatarId;
     }
 
@@ -329,6 +353,13 @@ public class UserCommandServiceImpl implements UserCommandService {
         WriteLogCmd logCmd = commandMapper.from("Change Avatar");
         UserActivityLog userActivityLog = new UserActivityLog(logCmd);
         user.setUserActivityLog(userActivityLog);
+
+        SyncUserRequest syncUserRequest = syncMapper.from(user);
+        SyncUserEvent syncUserEvent = SyncUserEvent.builder()
+                .syncUserType(SyncUserType.USER_UPDATED)
+                .syncUserRequest(syncUserRequest)
+                .build();
+        kafkaTemplate.send(KafkaTopic.SYNC_USER_GROUP.getTopicName(), syncUserEvent);
         return userDTOMapper.domainModelToDTO(userDomainRepository.save(user));
     }
 
@@ -341,20 +372,27 @@ public class UserCommandServiceImpl implements UserCommandService {
             keycloakService.lockUser(user.getProviderId(), enabled);
             Map<String, Object> params = SecurityContextUtils.getSecurityContextMap();
             params.put("username", username);
-            SendNotificationRequest mailAlert = SendNotificationRequest.builder()
+            SendNotificationEvent mailAlert = SendNotificationEvent.builder()
                     .channel(Channel.EMAIL.name())
                     .recipient(user.getEmail())
                     .templateCode(TemplateCode.LOCK_USER_ALERT)
                     .param(params)
                     .build();
             kafkaTemplate.send("notification-group", mailAlert);
+
+            SyncUserRequest syncUserRequest = syncMapper.from(user);
+            SyncUserEvent syncUserEvent = SyncUserEvent.builder()
+                    .syncUserType(SyncUserType.USER_UPDATED)
+                    .syncUserRequest(syncUserRequest)
+                    .build();
+            kafkaTemplate.send(KafkaTopic.SYNC_USER_GROUP.getTopicName(), syncUserEvent);
         } catch (FeignException e) {
             throw errorNormalizer.handleKeyCloakException(e);
         }
     }
 
     @Override
-    public void testFcm(PushNotificationRequest pushNotificationRequest) {
-        kafkaTemplate.send(KafkaTopic.PUSH_NOTIFICATION_GROUP.getTopicName(), pushNotificationRequest);
+    public void testFcm(PushNotificationEvent pushNotificationEvent) {
+        kafkaTemplate.send(KafkaTopic.PUSH_NOTIFICATION_GROUP.getTopicName(), pushNotificationEvent);
     }
 }

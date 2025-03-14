@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Repository;
 
+import com.evo.common.repository.AbstractDomainRepository;
 import com.evotek.notification.domain.UserTopic;
 import com.evotek.notification.domain.repository.UserTopicDomainRepository;
 import com.evotek.notification.infrastructure.persistence.entity.UserTopicEntity;
