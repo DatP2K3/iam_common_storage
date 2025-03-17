@@ -1,4 +1,10 @@
-/.idea/
-/logs/
-/uploads/
-/exports/
+.idea/
+logs/
+uploads/
+exports/
+notification/src/main/resources/firebase-service-account.json
+iam/src/main/resources/application.yaml
+gateway/src/main/resources/application.yaml
+elasticsearch/src/main/resources/application.yaml
+storage/src/main/resources/application.yaml
+notification/src/main/resources/application.yaml

@@ -1,5 +1,22 @@
 package com.evotek.storage.application.service.impl;
 
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
+import javax.imageio.ImageIO;
+
+import jakarta.annotation.PostConstruct;
+
+import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.evo.common.dto.response.FileResponse;
 import com.evotek.storage.application.config.FileStorageProperties;
 import com.evotek.storage.application.dto.mapper.FileResponseMapper;
@@ -14,22 +31,8 @@ import com.evotek.storage.domain.command.WriteHistoryCmd;
 import com.evotek.storage.domain.repository.FileDomainRepository;
 import com.evotek.storage.infrastructure.support.exception.AppErrorCode;
 import com.evotek.storage.infrastructure.support.exception.AppException;
-import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
-import org.springframework.web.multipart.MultipartFile;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -45,9 +48,11 @@ public class FileCommandServiceImpl implements FileCommandService {
     public void init() {
         try {
             this.publicStorageLocation = Paths.get(fileStorageProperties.getPublicUploadDir())
-                    .toAbsolutePath().normalize();
+                    .toAbsolutePath()
+                    .normalize();
             this.privateStorageLocation = Paths.get(fileStorageProperties.getPrivateUploadDir())
-                    .toAbsolutePath().normalize();
+                    .toAbsolutePath()
+                    .normalize();
 
             Files.createDirectories(publicStorageLocation);
             Files.createDirectories(privateStorageLocation);
@@ -59,7 +64,7 @@ public class FileCommandServiceImpl implements FileCommandService {
     @Override
     public List<FileResponse> storeFile(List<MultipartFile> files, boolean isPublic, String description) {
         List<File> fileDomains = new ArrayList<>();
-        for(MultipartFile file : files) {
+        for (MultipartFile file : files) {
             try {
                 validateFile(file);
                 int fileWidth = 0;
@@ -102,7 +107,9 @@ public class FileCommandServiceImpl implements FileCommandService {
 
     @Override
     public FileResponse updateFile(UpdateFileRequest updateFileRequest) {
-        File file = fileDomainRepository.findById(updateFileRequest.getFileId()).orElseThrow(() -> new AppException((AppErrorCode.FILE_NOT_FOUND)));
+        File file = fileDomainRepository
+                .findById(updateFileRequest.getFileId())
+                .orElseThrow(() -> new AppException((AppErrorCode.FILE_NOT_FOUND)));
         UpdateFileCmd updateFileCmd = commandMapper.from(updateFileRequest);
         file.update(updateFileCmd);
         WriteHistoryCmd writeHistoryCmd = WriteHistoryCmd.builder()
@@ -116,7 +123,8 @@ public class FileCommandServiceImpl implements FileCommandService {
 
     @Override
     public void deleteFile(UUID fileId) {
-        File file = fileDomainRepository.findById(fileId).orElseThrow(() -> new AppException(AppErrorCode.FILE_NOT_FOUND));
+        File file =
+                fileDomainRepository.findById(fileId).orElseThrow(() -> new AppException(AppErrorCode.FILE_NOT_FOUND));
         file.setDeleted(true);
         WriteHistoryCmd writeHistoryCmd = WriteHistoryCmd.builder()
                 .fileId(file.getId())
@@ -128,8 +136,10 @@ public class FileCommandServiceImpl implements FileCommandService {
     }
 
     public void validateFile(MultipartFile file) {
-        List<String> allowedMimeTypes = Arrays.asList(fileStorageProperties.getAllowedTypes().split(","));
-        List<String> allowedExtensions = Arrays.asList(fileStorageProperties.getAllowedExtensions().split(","));
+        List<String> allowedMimeTypes =
+                Arrays.asList(fileStorageProperties.getAllowedTypes().split(","));
+        List<String> allowedExtensions =
+                Arrays.asList(fileStorageProperties.getAllowedExtensions().split(","));
 
         String contentType = file.getContentType();
         String fileName = file.getOriginalFilename();
@@ -143,7 +153,6 @@ public class FileCommandServiceImpl implements FileCommandService {
             throw new AppException(AppErrorCode.FILE_EXTENSION_NOT_ALLOWED);
         }
     }
-
 
     private boolean isImage(MultipartFile file) {
         String contentType = file.getContentType();

@@ -1,4 +1,4 @@
-package com.evotek.notification.exception;
+package com.evotek.notification.infrastructure.support.exception;
 
 import lombok.Getter;
 import lombok.Setter;

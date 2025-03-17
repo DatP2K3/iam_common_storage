@@ -1,5 +1,10 @@
 package com.evotek.storage.infrastructure.domainrepository;
 
+import java.util.List;
+import java.util.UUID;
+
+import org.springframework.stereotype.Repository;
+
 import com.evotek.storage.domain.File;
 import com.evotek.storage.domain.FileHistory;
 import com.evotek.storage.domain.query.SearchFileQuery;
@@ -10,23 +15,20 @@ import com.evotek.storage.infrastructure.persistence.mapper.FileEntityMapper;
 import com.evotek.storage.infrastructure.persistence.mapper.FileHistoryEntityMapper;
 import com.evotek.storage.infrastructure.persistence.repository.FileEntityRepository;
 import com.evotek.storage.infrastructure.persistence.repository.FileHistoryEntityRepository;
-import org.springframework.stereotype.Repository;
-
-import java.util.List;
-import java.util.UUID;
 
 @Repository
 public class FileDomainRepositoryImpl extends AbstractDomainRepository<File, FileEntity, UUID>
-    implements FileDomainRepository {
+        implements FileDomainRepository {
     private final FileEntityMapper fileEntityMapper;
     private final FileEntityRepository fileEntityRepository;
     private final FileHistoryEntityMapper fileHistoryEntityMapper;
     private final FileHistoryEntityRepository fileHistoryEntityRepository;
 
-    public FileDomainRepositoryImpl(FileEntityRepository fileEntityRepository,
-                                    FileEntityMapper fileEntityMapper,
-                                    FileHistoryEntityMapper fileHistoryEntityMapper,
-                                    FileHistoryEntityRepository fileHistoryEntityRepository) {
+    public FileDomainRepositoryImpl(
+            FileEntityRepository fileEntityRepository,
+            FileEntityMapper fileEntityMapper,
+            FileHistoryEntityMapper fileHistoryEntityMapper,
+            FileHistoryEntityRepository fileHistoryEntityRepository) {
         super(fileEntityRepository, fileEntityMapper);
         this.fileEntityRepository = fileEntityRepository;
         this.fileEntityMapper = fileEntityMapper;
@@ -47,9 +49,7 @@ public class FileDomainRepositoryImpl extends AbstractDomainRepository<File, Fil
 
     @Override
     public List<File> saveAll(List<File> domains) {
-        List<FileHistory> fileHistories = domains.stream()
-                .map(File::getHistory)
-                .toList();
+        List<FileHistory> fileHistories = domains.stream().map(File::getHistory).toList();
         List<FileEntity> fileEntities = fileEntityMapper.toEntityList(domains);
         List<FileHistoryEntity> fileHistoryEntities = fileHistoryEntityMapper.toEntityList(fileHistories);
         fileHistoryEntityRepository.saveAll(fileHistoryEntities);

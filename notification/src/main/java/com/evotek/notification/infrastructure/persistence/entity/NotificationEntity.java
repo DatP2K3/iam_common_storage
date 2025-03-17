@@ -1,10 +1,13 @@
 package com.evotek.notification.infrastructure.persistence.entity;
 
+import java.util.Map;
 import java.util.UUID;
 
 import jakarta.persistence.*;
 
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,9 +19,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@EntityListeners(AuditingEntityListener.class)
-@Table(name = "push_notification_events")
-public class PushNotificationEventEntity {
+@EnableJpaAuditing
+@Table(name = "notification")
+public class NotificationEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id")
@@ -30,12 +33,16 @@ public class PushNotificationEventEntity {
     @Column(name = "body")
     private String body;
 
+    @Column(name = "image_url")
+    private String imageUrl;
+
     @Column(name = "topic")
     private String topic;
 
-    @Column(name = "token")
-    private String token;
+    @Column(name = "user_id")
+    private UUID userId;
 
-    @Column(name = "data", columnDefinition = "TEXT")
-    private String data;
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "data", columnDefinition = "jsonb")
+    private Map<String, String> data;
 }

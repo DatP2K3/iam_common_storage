@@ -1,5 +1,7 @@
 package com.evo.common.webapp.security;
 
+import java.util.Arrays;
+
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.cloud.openfeign.EnableFeignClients;
@@ -60,7 +62,9 @@ public class HttpSecurityConfiguration {
         "/swagger-doc/**",
         "/api/test-retry",
         "api/test/refresh",
-        "/api/config/reload"
+        "/api/config/reload",
+        "/api/test/**",
+        "/api/outbound/authentication"
     };
 
     public HttpSecurityConfiguration(
@@ -112,10 +116,10 @@ public class HttpSecurityConfiguration {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOrigin("*");
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
         configuration.addAllowedMethod("*");
         configuration.addAllowedHeader("*");
-        configuration.setAllowCredentials(false);
+        configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

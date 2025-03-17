@@ -1,21 +1,23 @@
 package com.evotek.storage.presentation.rest;
 
+import java.util.List;
+import java.util.UUID;
+
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.evo.common.dto.response.ApiResponses;
 import com.evo.common.dto.response.FileResponse;
 import com.evotek.storage.application.dto.request.SearchFileRequest;
 import com.evotek.storage.application.dto.request.UpdateFileRequest;
 import com.evotek.storage.application.service.FileCommandService;
 import com.evotek.storage.application.service.FileQueryService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api")// đổi api thôi
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class FileController {
     private final FileCommandService fileCommandService;
@@ -23,7 +25,8 @@ public class FileController {
 
     @PreAuthorize("hasPermission(null, 'file.create')")
     @PostMapping("/file/upload")
-    public ApiResponses<List<FileResponse>> storeFile(@RequestPart List<MultipartFile> files,  @RequestParam boolean isPublic, @RequestParam String description) {
+    public ApiResponses<List<FileResponse>> storeFile(
+            @RequestPart List<MultipartFile> files, @RequestParam boolean isPublic, @RequestParam String description) {
         List<FileResponse> fileResponses = fileCommandService.storeFile(files, isPublic, description);
         return ApiResponses.<List<FileResponse>>builder()
                 .data(fileResponses)
@@ -36,7 +39,7 @@ public class FileController {
     }
 
     @PreAuthorize("hasPermission(null, 'file.read')")
-    @GetMapping("/{filedId}")
+    @GetMapping("/file/{filedId}")
     public ApiResponses<FileResponse> getFile(@PathVariable UUID filedId) {
         FileResponse fileResponse = fileQueryService.getPrivateFile(filedId);
         return ApiResponses.<FileResponse>builder()
@@ -50,13 +53,13 @@ public class FileController {
     }
 
     @PreAuthorize("hasPermission(null, 'file.admin')")
-    @GetMapping("")
+    @GetMapping("/file")
     public ApiResponses<List<FileResponse>> searchFiles(@RequestBody SearchFileRequest searchFileRequest) {
         return fileQueryService.search(searchFileRequest);
     }
 
     @PreAuthorize("hasPermission(null, 'file.update')")
-    @PutMapping("/update")
+    @PutMapping("file/update")
     public ApiResponses<FileResponse> updateFile(@RequestBody UpdateFileRequest updateFileRequest) {
         FileResponse fileResponse = fileCommandService.updateFile(updateFileRequest);
         return ApiResponses.<FileResponse>builder()
@@ -70,7 +73,7 @@ public class FileController {
     }
 
     @PreAuthorize("hasPermission(null, 'file.delete')")
-    @DeleteMapping("/delete/{fileId}")
+    @DeleteMapping("file/delete/{fileId}")
     public ApiResponses<Void> deleteFile(@PathVariable UUID fileId) {
         fileCommandService.deleteFile(fileId);
         return ApiResponses.<Void>builder()

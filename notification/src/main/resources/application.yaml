@@ -1,0 +1,52 @@
+spring:
+  application:
+    name: notification-service
+  datasource:
+    url: ${DBMS_CONNECTION:jdbc:postgresql://localhost:5433/noti}
+    username: ${DBMS_USERNAME:postgres}
+    password: ${DBMS_PASSWORD:14062003}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME:testmailsender2k3@gmail.com}
+    password: ${MAIL_PASSWORD:tbfyoopqxhoompgm}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+  kafka:
+    consumer:
+      bootstrap-servers: localhost:9094
+      group-id: notification-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+
+  cloud:
+    consul:
+      host: 127.0.0.1
+      port: 8500
+      discovery:
+        enabled: true
+        service-name: notification-service
+        health-check-path: /actuator/health
+        health-check-interval: 10s
+        prefer-ip-address: true
+  doc:
+    swagger-ui:
+      path: /swagger-doc/notification/swagger-ui.html
+    api-docs:
+      path: /swagger-doc/v3/api-docs/notification
+
+server:
+  port: 3333

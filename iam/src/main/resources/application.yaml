@@ -1,0 +1,106 @@
+spring:
+  application:
+    name: iam-service
+  main:
+    banner-mode: 'off'
+    allow-bean-definition-overriding: true
+  datasource:
+    url: ${DBMS_CONNECTION:jdbc:postgresql://localhost:5433/iam_db2}
+    username: ${DBMS_USERNAME:postgres}
+    password: ${DBMS_PASSWORD:14062003}
+  driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+    ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME:testmailsender2k3@gmail.com}
+    password: ${MAIL_PASSWORD:tbfyoopqxhoompgm}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 50MB
+      max-request-size: 50MB
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uris:
+            internal: http://localhost:8888/api/certificate/.well-known/jwks.json
+            sso: http://localhost:8180/realms/IamService/protocol/openid-connect/certs
+  cloud:
+    consul:
+      host: 127.0.0.1
+      port: 8500
+      discovery:
+        enabled: true
+        service-name: iam-service
+        health-check-path: /actuator/health
+        health-check-interval: 10s
+        prefer-ip-address: true
+  config:
+    import: optional:configserver:http://localhost:6969
+  kafka:
+    producer:
+      bootstrap-servers: localhost:9094
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+server:
+  port: 8888
+
+redis:
+  host: localhost
+  port: 6379
+
+jwt:
+  key-store: keystore.jks
+  key-store-password: ${JWT_KEY_STORE_PASSWORD:@123Hello}
+  key-alias: viz
+  valid-duration: 3600
+  refreshable-duration: 36000
+
+idp:
+  url: http://localhost:8180
+  client-id: ${KEYCLOAK_CLIENT_ID:iam_service}
+  client-secret: ${KEYCLOAK_CLIENT_SECRET:FEn2lOqmNgHdAWUAvsvBiOpOdM3PLGHi}
+
+storage-service:
+  url: http://localhost:8080
+
+notification:
+  url: http://localhost:3333
+
+auth:
+  keycloak-enabled: true
+
+app:
+  iam:
+    internal-url: http://localhost:8888
+
+oauth:
+  client:
+    iam:
+      client-id: ${IAM_CLIENT_ID:iam}
+      client-secret: ${IAM_CLIENT_SECRET:FEn2lOqmNg}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+
+springdoc:
+  swagger-ui:
+    path: /swagger-doc/iam/swagger-ui.html
+  api-docs:
+    path: /swagger-doc/v3/api-docs/iam

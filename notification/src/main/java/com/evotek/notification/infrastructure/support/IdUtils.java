@@ -1,4 +1,4 @@
-package com.evotek.iam.infrastructure.support;
+package com.evotek.notification.infrastructure.support;
 
 import java.util.UUID;
 

@@ -1,4 +1,4 @@
-package com.evotek.notification.config;
+package com.evotek.notification.application.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

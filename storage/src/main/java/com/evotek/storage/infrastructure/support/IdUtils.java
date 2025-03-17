@@ -2,7 +2,11 @@ package com.evotek.storage.infrastructure.support;
 
 import java.util.UUID;
 
-public class IdUtils {
+public final class IdUtils {
+    private IdUtils() {
+        throw new UnsupportedOperationException("Utility class should not be instantiated");
+    }
+
     public static UUID nextId() {
         return UUID.randomUUID();
     }

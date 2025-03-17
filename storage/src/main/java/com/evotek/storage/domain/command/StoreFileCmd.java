@@ -8,7 +8,6 @@ import lombok.Setter;
 @Setter
 @Builder
 public class StoreFileCmd {
-    private int UUID;
     private String originName;
     private String fileType;
     private int fileHeight;

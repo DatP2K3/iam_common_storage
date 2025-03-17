@@ -2,9 +2,9 @@ package com.evotek.notification.infrastructure.persistence.mapper;
 
 import org.mapstruct.Mapper;
 
-import com.evotek.notification.domain.Notification;
-import com.evotek.notification.infrastructure.persistence.entity.NotificationEntity;
+import com.evo.common.mapper.EntityMapper;
+import com.evotek.notification.domain.DeviceRegistration;
+import com.evotek.notification.infrastructure.persistence.entity.DeviceRegistrationEntity;
 
 @Mapper(componentModel = "Spring")
-public interface NotificationEntityMapper
-        extends EntityMapper<Notification, NotificationEntity> {}
+public interface DeviceRegistrationEntityMapper extends EntityMapper<DeviceRegistration, DeviceRegistrationEntity> {}

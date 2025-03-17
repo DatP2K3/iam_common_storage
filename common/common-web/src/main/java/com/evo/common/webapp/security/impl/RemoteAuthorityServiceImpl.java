@@ -1,7 +1,5 @@
 package com.evo.common.webapp.security.impl;
 
-import java.util.UUID;
-
 import org.springframework.stereotype.Service;
 
 import com.evo.common.UserAuthority;
@@ -18,17 +16,12 @@ public class RemoteAuthorityServiceImpl implements AuthorityService {
     private final IamNoTokenClient iamNoTokenClient;
 
     @Override
-    public UserAuthority getUserAuthority(UUID userId) {
-        return null;
-    }
-
-    @Override
     public UserAuthority getUserAuthority(String username) {
-        return null;
+        return iamClient.getUserAuthority(username).getData();
     }
 
     @Override
     public UserAuthority getClientAuthority(String clientId) {
-        return null;
+        return iamNoTokenClient.getClientAuthority(clientId).getData();
     }
 }

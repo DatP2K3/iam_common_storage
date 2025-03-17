@@ -1,0 +1,53 @@
+spring:
+  application:
+    name: elasticsearch-service
+  main:
+    banner-mode: off
+    allow-bean-definition-overriding: true
+  kafka:
+    consumer:
+      bootstrap-servers: localhost:9094
+      group-id: sync-data-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uris:
+            internal: http://localhost:8888/api/certificate/.well-known/jwks.json
+            sso: http://localhost:8180/realms/IamService/protocol/openid-connect/certs
+
+  cloud:
+    consul:
+      host: 127.0.0.1
+      port: 8500
+      discovery:
+        enabled: true
+        service-name: elasticsearch-service
+        health-check-path: /actuator/health
+        health-check-interval: 10s
+        prefer-ip-address: true
+
+server:
+  port: 5555
+
+auth:
+  keycloak-enabled: true
+
+oauth:
+  client:
+    iam:
+      client-id: ${IAM_CLIENT_ID:iam}
+      client-secret: ${IAM_CLIENT_SECRET:FEn2lOqmNg}
+
+redis:
+  host: localhost
+  port: 6379
+
+app:
+  iam:
+    internal-url: http://localhost:8888

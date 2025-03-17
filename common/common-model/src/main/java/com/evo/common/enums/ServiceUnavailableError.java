@@ -6,6 +6,7 @@ public enum ServiceUnavailableError implements ResponseError {
     SERVICE_UNAVAILABLE_ERROR(50300001, "Service unavailable"),
     IAM_SERVICE_UNAVAILABLE_ERROR(50300002, "IAM Service unavailable"),
     STORAGE_SERVICE_UNAVAILABLE_ERROR(50300003, "Storage Service unavailable"),
+    NOTIFICATION_SERVICE_UNAVAILABLE_ERROR(50300004, "Notification Service unavailable"),
     ;
 
     private final Integer code;

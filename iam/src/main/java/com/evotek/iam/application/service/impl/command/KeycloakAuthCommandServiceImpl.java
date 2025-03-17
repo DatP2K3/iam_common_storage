@@ -17,10 +17,10 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import com.evo.common.dto.event.NotificationEvent;
+import com.evo.common.dto.event.SendNotificationEvent;
 import com.evo.common.enums.Channel;
+import com.evo.common.enums.KafkaTopic;
 import com.evo.common.enums.TemplateCode;
-import com.evo.common.enums.Topic;
 import com.evo.common.support.SecurityContextUtils;
 import com.evotek.iam.application.configuration.TokenProvider;
 import com.evotek.iam.application.dto.request.LoginRequest;
@@ -32,8 +32,7 @@ import com.evotek.iam.domain.UserActivityLog;
 import com.evotek.iam.domain.command.ResetKeycloakPasswordCmd;
 import com.evotek.iam.domain.command.WriteLogCmd;
 import com.evotek.iam.domain.repository.UserDomainRepository;
-import com.evotek.iam.infrastructure.adapter.keycloak.KeycloakCommandClient;
-import com.evotek.iam.infrastructure.adapter.keycloak.KeycloakQueryClient;
+import com.evotek.iam.infrastructure.adapter.keycloak.KeycloakService;
 import com.evotek.iam.infrastructure.support.exception.AuthErrorCode;
 import com.evotek.iam.infrastructure.support.exception.AuthException;
 import com.evotek.iam.infrastructure.support.exception.ErrorNormalizer;
@@ -49,15 +48,14 @@ import lombok.RequiredArgsConstructor;
 @Component("keycloakAuthCommandService")
 @RequiredArgsConstructor
 public class KeycloakAuthCommandServiceImpl implements AuthServiceCommand {
-    private final KeycloakQueryClient keycloakQueryClient;
-    private final KeycloakCommandClient keycloakCommandClient;
+    private final KeycloakService keycloakService;
     private final ErrorNormalizer errorNormalizer;
     private final PasswordEncoder passwordEncoder;
     private final RedisTemplate<Object, Object> redisTemplate;
     private final UserDomainRepository userDomainRepository;
     private final CommandMapper commandMapper;
+    private final KafkaTemplate<String, SendNotificationEvent> kafkaTemplate;
     private final TokenProvider tokenProvider;
-    private final KafkaTemplate<String, NotificationEvent> kafkaTemplate;
 
     @Value("${jwt.valid-duration}")
     private long validDuration;
@@ -68,7 +66,7 @@ public class KeycloakAuthCommandServiceImpl implements AuthServiceCommand {
     @Override
     public TokenDTO authenticate(LoginRequest loginRequest) {
         try {
-            TokenDTO tokenDTO = keycloakQueryClient.authenticate(loginRequest);
+            TokenDTO tokenDTO = keycloakService.authenticate(loginRequest);
 
             User user = userDomainRepository.getByUsername(loginRequest.getUsername());
             WriteLogCmd logCmd = commandMapper.from("Login");
@@ -78,13 +76,13 @@ public class KeycloakAuthCommandServiceImpl implements AuthServiceCommand {
 
             Map<String, Object> params = SecurityContextUtils.getSecurityContextMap();
             params.put("username", loginRequest.getUsername());
-            NotificationEvent mailAlert = NotificationEvent.builder()
+            SendNotificationEvent mailAlert = SendNotificationEvent.builder()
                     .channel(Channel.EMAIL.name())
                     .recipient(user.getEmail())
                     .templateCode(TemplateCode.LOGIN_ALERT)
                     .param(params)
                     .build();
-            kafkaTemplate.send(Topic.NOTIFICATION_GROUP.getTopicName(), mailAlert);
+            kafkaTemplate.send(KafkaTopic.SEND_NOTIFICATION_GROUP.getTopicName(), mailAlert);
             return tokenDTO;
         } catch (FeignException exception) {
             throw errorNormalizer.handleKeyCloakException(exception);
@@ -103,7 +101,7 @@ public class KeycloakAuthCommandServiceImpl implements AuthServiceCommand {
             String accessJit = signedJWT.getJWTClaimsSet().getJWTID();
             Date expiryTime = signedJWT.getJWTClaimsSet().getExpirationTime();
             redisTemplate.opsForValue().set(accessJit, expiryTime, 3600, TimeUnit.MILLISECONDS);
-            keycloakCommandClient.logout(authorizationHeader, refreshToken);
+            keycloakService.logout(authorizationHeader, refreshToken);
 
             String username = signedJWT.getJWTClaimsSet().getStringClaim("preferred_username");
             User user = userDomainRepository.getByUsername(username);
@@ -121,7 +119,7 @@ public class KeycloakAuthCommandServiceImpl implements AuthServiceCommand {
 
     @Override
     public TokenDTO refresh(String refreshToken) {
-        return keycloakCommandClient.refreshToken(refreshToken);
+        return keycloakService.refreshToken(refreshToken);
     }
 
     @Override
@@ -133,13 +131,13 @@ public class KeycloakAuthCommandServiceImpl implements AuthServiceCommand {
             Map<String, Object> params = SecurityContextUtils.getSecurityContextMap();
             params.put("resetUrl", resetUrl);
             params.put("username", username);
-            NotificationEvent mailAlert = NotificationEvent.builder()
+            SendNotificationEvent mailAlert = SendNotificationEvent.builder()
                     .channel(Channel.EMAIL.name())
                     .recipient(user.getEmail())
                     .templateCode(TemplateCode.REQUEST_CHANGE_PASSWORD)
                     .param(params)
                     .build();
-            kafkaTemplate.send("notification-group", mailAlert);
+            kafkaTemplate.send(KafkaTopic.SEND_NOTIFICATION_GROUP.getTopicName(), mailAlert);
         } catch (Exception ex) {
             throw new AuthException(AuthErrorCode.UNCATEGORIZED_EXCEPTION);
         }
@@ -153,10 +151,7 @@ public class KeycloakAuthCommandServiceImpl implements AuthServiceCommand {
             User user = userDomainRepository.getByUsername(username);
             user.changePassword(passwordEncoder.encode(resetKeycloakPasswordCmd.getValue()));
 
-            var keycloakToken = keycloakQueryClient.getClientToken();
-
-            keycloakCommandClient.resetPassword(
-                    "Bearer " + keycloakToken, user.getProviderId(), resetKeycloakPasswordCmd);
+            keycloakService.resetPassword(user.getProviderId(), resetKeycloakPasswordCmd);
 
             WriteLogCmd cmd = commandMapper.from("Change password");
             UserActivityLog userActivityLog = new UserActivityLog(cmd);
@@ -164,13 +159,13 @@ public class KeycloakAuthCommandServiceImpl implements AuthServiceCommand {
             userDomainRepository.save(user);
 
             Map<String, Object> params = SecurityContextUtils.getSecurityContextMap();
-            NotificationEvent mailAlert = NotificationEvent.builder()
+            SendNotificationEvent mailAlert = SendNotificationEvent.builder()
                     .channel(Channel.EMAIL.name())
                     .recipient(user.getEmail())
                     .templateCode(TemplateCode.PASSWORD_CHANGE_ALERT)
                     .param(params)
                     .build();
-            kafkaTemplate.send("notification-group", mailAlert);
+            kafkaTemplate.send(KafkaTopic.SEND_NOTIFICATION_GROUP.getTopicName(), mailAlert);
         } catch (Exception ex) {
             throw new AuthException(AuthErrorCode.UNCATEGORIZED_EXCEPTION);
         }
