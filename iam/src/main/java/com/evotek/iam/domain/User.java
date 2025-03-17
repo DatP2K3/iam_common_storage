@@ -54,7 +54,7 @@ public class User extends Auditor {
         this.locked = false;
         this.providerId = cmd.getProviderId();
         if (cmd.getUserRole() != null) {
-            this.userRole = new UserRole(cmd.getUserRole(), this.selfUserID);
+            this.userRole = new UserRole(cmd.getUserRole().getRoleId(), this.selfUserID);
         }
     }
 

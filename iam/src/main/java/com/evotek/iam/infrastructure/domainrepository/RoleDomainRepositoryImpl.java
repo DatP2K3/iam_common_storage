@@ -3,11 +3,11 @@ package com.evotek.iam.infrastructure.domainrepository;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import com.evo.common.repository.AbstractDomainRepository;
 import jakarta.transaction.Transactional;
 
 import org.springframework.stereotype.Repository;
 
+import com.evo.common.repository.AbstractDomainRepository;
 import com.evotek.iam.domain.Permission;
 import com.evotek.iam.domain.Role;
 import com.evotek.iam.domain.RolePermission;

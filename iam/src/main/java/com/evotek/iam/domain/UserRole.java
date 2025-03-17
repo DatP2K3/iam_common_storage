@@ -3,7 +3,6 @@ package com.evotek.iam.domain;
 import java.util.UUID;
 
 import com.evo.common.Auditor;
-import com.evotek.iam.domain.command.CreateUserRoleCmd;
 import com.evotek.iam.infrastructure.support.IdUtils;
 
 import lombok.*;
@@ -20,9 +19,9 @@ public class UserRole extends Auditor {
     private UUID userId;
     private UUID roleId;
 
-    public UserRole(CreateUserRoleCmd createUserRoleCmd, UUID userId) {
+    public UserRole(UUID roleId, UUID userId) {
         this.id = IdUtils.nextId();
         this.userId = userId;
-        this.roleId = createUserRoleCmd.getRoleId();
+        this.roleId = roleId;
     }
 }

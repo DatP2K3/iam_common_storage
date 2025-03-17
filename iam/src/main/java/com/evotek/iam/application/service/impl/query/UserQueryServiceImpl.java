@@ -9,6 +9,7 @@ import org.jxls.builder.JxlsOutput;
 import org.jxls.builder.JxlsOutputFile;
 import org.jxls.transform.poi.JxlsPoiTemplateFillerBuilder;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.evo.common.UserAuthority;
@@ -37,7 +38,10 @@ public class UserQueryServiceImpl implements UserQueryService {
     private final OauthClientDomainRepository oauthClientDomainRepository;
 
     @Override
-    public UserDTO getUserInfo(String username) {
+    public UserDTO getMyUserInfo() {
+        var context = SecurityContextHolder.getContext();
+        String username = context.getAuthentication().getName();
+
         User user = userDomainRepository.getByUsername(username);
         return userDTOMapper.domainModelToDTO(user);
     }

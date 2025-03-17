@@ -7,7 +7,7 @@ import com.evotek.iam.application.dto.request.SearchUserRequest;
 import com.evotek.iam.application.dto.response.UserDTO;
 
 public interface UserQueryService {
-    UserDTO getUserInfo(String username);
+    UserDTO getMyUserInfo();
 
     Long totalUsers(SearchUserRequest request);
 

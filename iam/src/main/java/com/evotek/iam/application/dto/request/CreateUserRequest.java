@@ -1,6 +1,7 @@
 package com.evotek.iam.application.dto.request;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Past;
@@ -13,10 +14,11 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreateUserRequest {
+    private UUID providerId;
+
     @NotBlank(message = "UserName cannot be blank")
     private String username;
 
-    @NotBlank(message = "Password cannot be blank")
     @Pattern(
             regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&-+=()!?\"]).{8,128}$",
             message =
@@ -42,6 +44,8 @@ public class CreateUserRequest {
     private String city;
 
     private int yearsOfExperience;
+
+    private String provider;
 
     private CreateUserRoleRequest userRole;
 }

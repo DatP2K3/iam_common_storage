@@ -54,8 +54,8 @@ public class KeycloakAuthCommandServiceImpl implements AuthServiceCommand {
     private final RedisTemplate<Object, Object> redisTemplate;
     private final UserDomainRepository userDomainRepository;
     private final CommandMapper commandMapper;
-    private final TokenProvider tokenProvider;
     private final KafkaTemplate<String, SendNotificationEvent> kafkaTemplate;
+    private final TokenProvider tokenProvider;
 
     @Value("${jwt.valid-duration}")
     private long validDuration;

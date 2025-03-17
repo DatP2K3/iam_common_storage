@@ -5,11 +5,11 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import com.evo.common.repository.AbstractDomainRepository;
 import jakarta.transaction.Transactional;
 
 import org.springframework.stereotype.Repository;
 
+import com.evo.common.repository.AbstractDomainRepository;
 import com.evotek.iam.domain.User;
 import com.evotek.iam.domain.UserActivityLog;
 import com.evotek.iam.domain.UserRole;

@@ -1,9 +1,10 @@
 package com.evotek.iam.application.mapper;
 
-import com.evo.common.dto.request.SyncUserRequest;
-import com.evotek.iam.domain.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+
+import com.evo.common.dto.request.SyncUserRequest;
+import com.evotek.iam.domain.User;
 
 @Mapper(componentModel = "spring")
 public interface SyncMapper {

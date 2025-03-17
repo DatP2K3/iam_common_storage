@@ -4,30 +4,36 @@ import java.io.IOException;
 import java.time.ZoneId;
 import java.util.*;
 
-import com.evo.common.dto.event.PushNotificationEvent;
-import com.evo.common.dto.event.SyncUserEvent;
-import com.evo.common.dto.request.SyncUserRequest;
-import com.evo.common.enums.SyncUserType;
-import com.evotek.iam.application.mapper.SyncMapper;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.evo.common.dto.event.PushNotificationEvent;
 import com.evo.common.dto.event.SendNotificationEvent;
+import com.evo.common.dto.event.SyncUserEvent;
+import com.evo.common.dto.request.SyncUserRequest;
 import com.evo.common.dto.response.FileResponse;
 import com.evo.common.enums.Channel;
 import com.evo.common.enums.KafkaTopic;
+import com.evo.common.enums.SyncUserType;
 import com.evo.common.enums.TemplateCode;
 import com.evo.common.support.SecurityContextUtils;
 import com.evotek.iam.application.dto.mapper.UserDTOMapper;
 import com.evotek.iam.application.dto.request.ChangePasswordRequest;
 import com.evotek.iam.application.dto.request.CreateUserRequest;
+import com.evotek.iam.application.dto.request.ExchangeTokenRequest;
 import com.evotek.iam.application.dto.request.UpdateUserRequest;
+import com.evotek.iam.application.dto.response.OutboundUserDTO;
+import com.evotek.iam.application.dto.response.TokenDTO;
 import com.evotek.iam.application.dto.response.UserDTO;
 import com.evotek.iam.application.mapper.CommandMapper;
+import com.evotek.iam.application.mapper.SyncMapper;
 import com.evotek.iam.application.service.UserCommandService;
 import com.evotek.iam.domain.Role;
 import com.evotek.iam.domain.User;
@@ -36,6 +42,7 @@ import com.evotek.iam.domain.UserRole;
 import com.evotek.iam.domain.command.*;
 import com.evotek.iam.domain.repository.RoleDomainRepository;
 import com.evotek.iam.domain.repository.UserDomainRepository;
+import com.evotek.iam.infrastructure.adapter.google.GoogleService;
 import com.evotek.iam.infrastructure.adapter.keycloak.KeycloakService;
 import com.evotek.iam.infrastructure.adapter.notification.NotificationService;
 import com.evotek.iam.infrastructure.adapter.storage.FileService;
@@ -60,26 +67,42 @@ public class UserCommandServiceImpl implements UserCommandService {
     private final FileService fileService;
     private final NotificationService notificationService;
     private final SyncMapper syncMapper;
+    private final GoogleService googleService;
+    private final SelfIDPAuthCommandServiceImpl selfIDPAuthCommandService;
 
     @Value("${auth.keycloak-enabled}")
-    boolean keycloakEnabled;
+    private boolean keycloakEnabled;
+
+    @Value("${outbound.identity.client-id}")
+    private String clientId;
+
+    @Value("${outbound.identity.client-secret}")
+    protected String clientSecret;
+
+    @Value("${outbound.identity.redirect-uri}")
+    protected String redirectUri;
+
+    protected String grantType = "authorization_code";
 
     @Override
     public UserDTO createDefaultUser(CreateUserRequest request) {
         try {
             CreateUserCmd createUserCmd = commandMapper.from(request);
-            createUserCmd.setPassword(passwordEncoder.encode(createUserCmd.getPassword()));
 
-            if (keycloakEnabled) {
-                createUserCmd.setProvider("keycloak");
+            if(request.getProvider() == null) {
+                if (keycloakEnabled) {
+                    createUserCmd.setProvider("keycloak");
+                } else {
+                    createUserCmd.setProvider("self_idp");
+                }
+                createUserCmd.setProviderId(UUID.fromString(keycloakService.createKeycloakUser(request)));
+                createUserCmd.setPassword(passwordEncoder.encode(createUserCmd.getPassword()));
             } else {
-                createUserCmd.setProvider("self_idp");
+                createUserCmd.setProvider(request.getProvider());
             }
-            createUserCmd.setProviderId(UUID.fromString(keycloakService.createKeycloakUser(request)));
             Role role = roleDomainRepository.findByName("ROLE_USER");
             User user = new User(createUserCmd);
-            CreateUserRoleCmd createUserRoleCmd = new CreateUserRoleCmd(role.getId());
-            UserRole userRole = new UserRole(createUserRoleCmd, user.getSelfUserID());
+            UserRole userRole = new UserRole(role.getId(), user.getSelfUserID());
             user.setUserRole(userRole);
             user = userDomainRepository.save(user);
 
@@ -147,7 +170,36 @@ public class UserCommandServiceImpl implements UserCommandService {
     }
 
     @Override
-    public void changePassword(String username, ChangePasswordRequest request) {
+    public void OverwritePassword(String username, ChangePasswordRequest request) {
+        User user = userDomainRepository.getByUsername(username);
+        UUID keycloakUserId = user.getProviderId();
+
+        ResetKeycloakPasswordCmd resetKeycloakPasswordCmd = ResetKeycloakPasswordCmd.builder()
+                .value(request.getNewPassword())
+                .build();
+        keycloakService.resetPassword(keycloakUserId, resetKeycloakPasswordCmd);
+
+        user.changePassword(passwordEncoder.encode(request.getNewPassword()));
+        WriteLogCmd logCmd = commandMapper.from("Change Password");
+        UserActivityLog userActivityLog = new UserActivityLog(logCmd);
+        user.setUserActivityLog(userActivityLog);
+        userDomainRepository.save(user);
+
+        Map<String, Object> params = SecurityContextUtils.getSecurityContextMap();
+        SendNotificationEvent mailAlert = SendNotificationEvent.builder()
+                .channel(Channel.EMAIL.name())
+                .recipient(user.getEmail())
+                .templateCode(TemplateCode.PASSWORD_CHANGE_ALERT)
+                .param(params)
+                .build();
+        kafkaTemplate.send(KafkaTopic.SEND_NOTIFICATION_GROUP.getTopicName(), mailAlert);
+    }
+
+    @Override
+    public void changeMyPassword(ChangePasswordRequest request) {
+        var context = SecurityContextHolder.getContext();
+        String username = context.getAuthentication().getName();
+
         ChangePasswordCmd changePasswordCmd = commandMapper.from(request);
 
         User user = userDomainRepository.getByUsername(username);
@@ -179,7 +231,10 @@ public class UserCommandServiceImpl implements UserCommandService {
     }
 
     @Override
-    public UUID changeAvatar(String username, List<MultipartFile> files) {
+    public UUID changeMyAvatar(List<MultipartFile> files) {
+        var context = SecurityContextHolder.getContext();
+        String username = context.getAuthentication().getName();
+
         User user = userDomainRepository.getByUsername(username);
         FileResponse fileResponse =
                 fileService.uploadFile(files, true, "avatar").getFirst();
@@ -345,7 +400,10 @@ public class UserCommandServiceImpl implements UserCommandService {
     }
 
     @Override
-    public UserDTO updateUser(String username, UpdateUserRequest updateUserRequest) {
+    public UserDTO updateMyUser(UpdateUserRequest updateUserRequest) {
+        var context = SecurityContextHolder.getContext();
+        String username = context.getAuthentication().getName();
+
         UpdateUserCmd cmd = commandMapper.from(updateUserRequest);
         User user = userDomainRepository.getByUsername(username);
         user.update(cmd);
@@ -394,5 +452,52 @@ public class UserCommandServiceImpl implements UserCommandService {
     @Override
     public void testFcm(PushNotificationEvent pushNotificationEvent) {
         kafkaTemplate.send(KafkaTopic.PUSH_NOTIFICATION_GROUP.getTopicName(), pushNotificationEvent);
+    }
+
+    @Override
+    public TokenDTO outboundAuthenticate(String code) {
+        ExchangeTokenRequest exchangeTokenRequest = ExchangeTokenRequest.builder()
+                .code(code)
+                .redirectUri(redirectUri)
+                .clientId(clientId)
+                .clientSecret(clientSecret)
+                .grantType(grantType)
+                .build();
+
+        TokenDTO tokenDTO = googleService.exchangeToken(exchangeTokenRequest);
+
+        OutboundUserDTO outboundUserDTO = googleService.getUserInfo(tokenDTO.getAccessToken());
+
+        boolean isUserExist = userDomainRepository.existsByUsername(outboundUserDTO.getEmail());
+
+        if (!isUserExist) {
+            CreateUserRequest createUserRequest = CreateUserRequest.builder()
+                    .username(outboundUserDTO.getEmail())
+                    .email(outboundUserDTO.getEmail())
+                    .firstName(outboundUserDTO.getGivenName())
+                    .lastName(outboundUserDTO.getFamilyName())
+                    .provider("google")
+                    .providerId(UUID.nameUUIDFromBytes(String.valueOf(outboundUserDTO.getSub()).getBytes()))
+                    .build();
+
+            UserDTO userDTO = createDefaultUser(createUserRequest);
+
+            User user = userDTOMapper.dtoToDomainModel(userDTO);
+
+            var accessToken = selfIDPAuthCommandService.generateToken(user, false, false);
+            var refreshToken = selfIDPAuthCommandService.generateToken(user, false, true);
+            return TokenDTO.builder()
+                    .accessToken(accessToken)
+                    .refreshToken(refreshToken)
+                    .build();
+        } else {
+            User user = userDomainRepository.getByUsername(outboundUserDTO.getEmail());
+            var accessToken = selfIDPAuthCommandService.generateToken(user, false, false);
+            var refreshToken = selfIDPAuthCommandService.generateToken(user, false, true);
+            return TokenDTO.builder()
+                    .accessToken(accessToken)
+                    .refreshToken(refreshToken)
+                    .build();
+        }
     }
 }

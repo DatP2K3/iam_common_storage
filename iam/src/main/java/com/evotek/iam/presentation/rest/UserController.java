@@ -1,6 +1,5 @@
 package com.evotek.iam.presentation.rest;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -12,15 +11,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.evo.common.UserAuthority;
 import com.evo.common.dto.response.ApiResponses;
-import com.evo.common.dto.response.PageApiResponse;
 import com.evotek.iam.application.dto.request.ChangePasswordRequest;
 import com.evotek.iam.application.dto.request.CreateUserRequest;
 import com.evotek.iam.application.dto.request.SearchUserRequest;
 import com.evotek.iam.application.dto.request.UpdateUserRequest;
+import com.evotek.iam.application.dto.response.TokenDTO;
 import com.evotek.iam.application.dto.response.UserDTO;
 import com.evotek.iam.application.service.UserCommandService;
 import com.evotek.iam.application.service.UserQueryService;
-import com.evotek.iam.infrastructure.adapter.storage.FileService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -35,7 +33,19 @@ import lombok.RequiredArgsConstructor;
 public class UserController {
     private final UserCommandService userCommandService;
     private final UserQueryService userQueryService;
-    private final FileService fileService;
+
+    @PostMapping("/outbound/authentication")
+    ApiResponses<TokenDTO> outboundAuthenticate(@RequestParam("code") String code) {
+        TokenDTO tokenDTO = userCommandService.outboundAuthenticate(code);
+        return ApiResponses.<TokenDTO>builder()
+                .data(tokenDTO)
+                .success(true)
+                .code(201)
+                .message("User created successfully")
+                .timestamp(System.currentTimeMillis())
+                .status("OK")
+                .build();
+    }
 
     @PreAuthorize("hasPermission(null, 'user.admin')")
     @GetMapping("/users/authorities-by-username/{username}")
@@ -115,9 +125,8 @@ public class UserController {
             responses = {@ApiResponse(responseCode = "200", description = "Thông tin người dùng")})
     @PreAuthorize("hasPermission(null, 'user.read')")
     @GetMapping("/users/my-info")
-    public ApiResponses<UserDTO> getMyInfo(
-            @Parameter(description = "Tên người dùng", required = true) @RequestParam String username) {
-        UserDTO userDTO = userQueryService.getUserInfo(username);
+    public ApiResponses<UserDTO> getMyInfo() {
+        UserDTO userDTO = userQueryService.getMyUserInfo();
         return ApiResponses.<UserDTO>builder()
                 .data(userDTO)
                 .success(true)
@@ -139,52 +148,13 @@ public class UserController {
             responses = {@ApiResponse(responseCode = "200", description = "Thông tin người dùng sau khi cập nhật")})
     @PreAuthorize("hasPermission(null, 'user.update')")
     @PutMapping("/users")
-    public ApiResponses<UserDTO> updateUser(
-            @Parameter(description = "username of user account", required = true) @RequestParam String username,
-            @RequestBody UpdateUserRequest updateUserRequest) {
-        UserDTO userDTO = userCommandService.updateUser(username, updateUserRequest);
+    public ApiResponses<UserDTO> updateUser(@RequestBody UpdateUserRequest updateUserRequest) {
+        UserDTO userDTO = userCommandService.updateMyUser(updateUserRequest);
         return ApiResponses.<UserDTO>builder()
                 .data(userDTO)
                 .success(true)
                 .code(200)
                 .message("Update user successfully")
-                .timestamp(System.currentTimeMillis())
-                .status("OK")
-                .build();
-    }
-
-    @Operation(
-            summary = "Tìm kiếm người dùng",
-            description = "API này sẽ trả về danh sách người dùng theo từ khóa tìm kiếm.",
-            requestBody =
-                    @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                            description = "Thông tin tìm kiếm",
-                            required = true,
-                            content = @Content(schema = @Schema(implementation = SearchUserRequest.class))),
-            responses = {@ApiResponse(responseCode = "200", description = "Danh sách người dùng")})
-    @PreAuthorize("hasPermission(null, 'user.manage')")
-    @GetMapping("/users/search")
-    public PageApiResponse<List<UserDTO>> search(@RequestBody SearchUserRequest searchUserRequest) {
-        Long totalUsers = userQueryService.totalUsers(searchUserRequest);
-        List<UserDTO> userDTOS = Collections.emptyList();
-        if (totalUsers != 0) {
-            userDTOS = userQueryService.search(searchUserRequest);
-        }
-        PageApiResponse.PageableResponse pageableResponse = PageApiResponse.PageableResponse.builder()
-                .pageSize(searchUserRequest.getPageSize())
-                .pageIndex(searchUserRequest.getPageIndex())
-                .totalElements(totalUsers)
-                .totalPages((int) (Math.ceil((double) totalUsers / searchUserRequest.getPageSize())))
-                .hasNext((searchUserRequest.getPageIndex() + 1L) * searchUserRequest.getPageSize() < totalUsers)
-                .hasPrevious(searchUserRequest.getPageIndex() > 1)
-                .build();
-
-        return PageApiResponse.<List<UserDTO>>builder()
-                .data(userDTOS)
-                .pageable(pageableResponse)
-                .success(true)
-                .code(200)
-                .message("Search user successfully")
                 .timestamp(System.currentTimeMillis())
                 .status("OK")
                 .build();
@@ -223,10 +193,8 @@ public class UserController {
             responses = {@ApiResponse(responseCode = "200", description = "Mật khẩu đã được đổi")})
     @PreAuthorize("hasPermission(null, 'user.update')")
     @PatchMapping("/users/change-password")
-    public ApiResponses<Void> changePassword(
-            @Parameter(description = "username of user account", required = true) @RequestParam String username,
-            @RequestBody ChangePasswordRequest changePasswordRequest) {
-        userCommandService.changePassword(username, changePasswordRequest);
+    public ApiResponses<Void> changeMyPassword(@RequestBody ChangePasswordRequest changePasswordRequest) {
+        userCommandService.changeMyPassword(changePasswordRequest);
         return ApiResponses.<Void>builder()
                 .success(true)
                 .code(200)
@@ -250,9 +218,8 @@ public class UserController {
             responses = {@ApiResponse(responseCode = "200", description = "Avatar đã được đổi thành công")})
     @PutMapping("/users/avatar")
     public ApiResponses<UUID> changeAvatar(
-            @Parameter(description = "Tên tài khoản", required = true) @RequestParam String username,
             @Parameter(description = "Tệp hình ảnh", required = true) @RequestPart List<MultipartFile> files) {
-        UUID avatarId = userCommandService.changeAvatar(username, files);
+        UUID avatarId = userCommandService.changeMyAvatar(files);
         return ApiResponses.<UUID>builder()
                 .data(avatarId)
                 .success(true)
@@ -283,6 +250,20 @@ public class UserController {
                 .success(true)
                 .code(200)
                 .message("Import user file successfully")
+                .timestamp(System.currentTimeMillis())
+                .status("OK")
+                .build();
+    }
+
+    @PreAuthorize("hasPermission(null, 'user.admin')")
+    @PutMapping("/users/overwrite-password")
+    ApiResponses<Void> resetPassword(
+            @RequestParam String username, @RequestBody ChangePasswordRequest changePasswordRequest) {
+        userCommandService.OverwritePassword(username, changePasswordRequest);
+        return ApiResponses.<Void>builder()
+                .success(true)
+                .code(200)
+                .message("Reset password successfully")
                 .timestamp(System.currentTimeMillis())
                 .status("OK")
                 .build();

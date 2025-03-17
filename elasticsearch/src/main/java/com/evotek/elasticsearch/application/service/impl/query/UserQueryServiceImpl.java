@@ -106,3 +106,5 @@ public class UserQueryServiceImpl implements UserQueryService {
                 .build();
     }
 }
+//từ file jarr viết docker file coppy file jarr vào image, viết docker compose(định nghĩa build)
+//c2: viết luôn trong docker file

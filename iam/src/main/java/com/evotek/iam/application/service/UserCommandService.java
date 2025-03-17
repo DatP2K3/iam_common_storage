@@ -10,6 +10,7 @@ import com.evo.common.dto.event.PushNotificationEvent;
 import com.evotek.iam.application.dto.request.ChangePasswordRequest;
 import com.evotek.iam.application.dto.request.CreateUserRequest;
 import com.evotek.iam.application.dto.request.UpdateUserRequest;
+import com.evotek.iam.application.dto.response.TokenDTO;
 import com.evotek.iam.application.dto.response.UserDTO;
 
 @Service
@@ -18,15 +19,19 @@ public interface UserCommandService {
 
     UserDTO createUser(CreateUserRequest request);
 
-    void changePassword(String username, ChangePasswordRequest request);
+    void OverwritePassword(String username, ChangePasswordRequest request);
 
-    UUID changeAvatar(String username, List<MultipartFile> files);
+    void changeMyPassword(ChangePasswordRequest request);
+
+    UUID changeMyAvatar(List<MultipartFile> files);
 
     List<UserDTO> importUserFile(MultipartFile file);
 
-    UserDTO updateUser(String username, UpdateUserRequest updateUserRequest);
+    UserDTO updateMyUser(UpdateUserRequest updateUserRequest);
 
     void lockUser(String username, boolean enabled);
 
     void testFcm(PushNotificationEvent pushNotificationEvent);
+
+    TokenDTO outboundAuthenticate(String code);
 }
